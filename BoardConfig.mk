@@ -64,12 +64,12 @@ BOARD_USES_GENERIC_KERNEL_IMAGE := true
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
-TW_LOAD_VENDOR_MODULES := $(shell echo \"$(shell ls $(DEVICE_PATH)/recovery/root/lib/modules)")
+TW_LOAD_VENDOR_BOOT_MODULES := true
 
 # copy first stage ramdisk
 #PRODUCT_COPY_FILES += \
 #    $(LOCAL_PATH)/recovery/root/first_stage_ramdisk/fstab.mt6899:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.mt6899
-	
+
 BOARD_VENDOR_CMDLINE := bootopt=64S3,32N2,64N2 erofs.reserved_pages=64
 BOARD_KERNEL_BASE := 0x3fff8000
 BOARD_PAGE_SIZE := 4096
@@ -102,7 +102,7 @@ BOARD_MAIN_PARTITION_LIST := \
     product \
     system \
     system_ext \
-    vendor 
+    vendor
 
 BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_ODM_DLKMIMAGE_FILE_SYSTEM_TYPE := erofs
