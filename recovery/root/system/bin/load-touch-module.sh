@@ -1,9 +1,8 @@
 set +e
 mod_dir="/vendor_dlkm/lib/modules"
 modules=(
-  focaltech_touch_klee.ko
+  nt38771_touch_klee.ko
   xiaomi_touch_klee.ko
-  goodix_core_klee
 )
 
 mount /vendor_dlkm
