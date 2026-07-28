@@ -114,6 +114,11 @@ jobs:
           ls -lh "$GITHUB_WORKSPACE/OrangeFox/device/xiaomi/klee/prebuilt/vendor_boot_stock.img"
           ls -lh "$GITHUB_WORKSPACE/OrangeFox/device/xiaomi/klee/prebuilt/vendor_ramdisk00" || true
 
+      - name: Apply patch
+        shell: bash
+        run: |
+          .${{ github.workspace }}/OrangeFox/device/xiaomi/klee/tools/apply-orangefox-patches.sh ${{ github.workspace }}/OrangeFox
+
       - name: Free space
         shell: bash
         run: |
