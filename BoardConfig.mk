@@ -21,7 +21,7 @@ TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
 TARGET_CPU_ABI2 :=
-TARGET_CPU_VARIANT := generic
+TARGET_CPU_VARIANT := cortex-a55
 TARGET_CPU_VARIANT_RUNTIME := cortex-a55
 
 TARGET_2ND_ARCH := arm
@@ -45,13 +45,6 @@ ALLOW_MISSING_DEPENDENCIES := true
 BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 
-# Crypto
-PLATFORM_VERSION := 99.87.36
-PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
-PLATFORM_SECURITY_PATCH := 2099-12-31
-BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-
 # Vendor Boot
 TARGET_KERNEL_ARCH := arm64
 BOARD_RAMDISK_USE_LZ4 := true
@@ -66,10 +59,6 @@ BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 TW_LOAD_VENDOR_BOOT_MODULES := true
 TW_LOAD_VENDOR_MODULES := "nt38771_touch_klee.ko xiaomi_touch.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
-
-# copy first stage ramdisk
-#PRODUCT_COPY_FILES += \
-#    $(LOCAL_PATH)/recovery/root/first_stage_ramdisk/fstab.mt6899:$(TARGET_COPY_OUT_RECOVERY)/root/first_stage_ramdisk/fstab.mt6899
 
 BOARD_VENDOR_CMDLINE := bootopt=64S3,32N2,64N2 erofs.reserved_pages=64
 BOARD_KERNEL_BASE := 0x3fff8000
@@ -96,7 +85,8 @@ BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 
 BOARD_SUPER_PARTITION_SIZE := 9125756928
 BOARD_SUPER_PARTITION_GROUPS := main
-BOARD_MAIN_SIZE := 9121562624 # (BOARD_SUPER_PARTITION_SIZE - 4194304) 4MiB
+BOARD_MAIN_SIZE := 9121562624
+
 BOARD_MAIN_PARTITION_LIST := \
     odm \
     odm_dlkm \
@@ -128,16 +118,12 @@ TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 TARGET_USERIMAGES_USE_EROFS := true
-TW_INCLUDE_EROFS := true
 
 # Hardware
 BOARD_USES_MTK_HARDWARE := true
 
 # Platform
 TARGET_BOARD_PLATFORM := mt6899
-
-# Properties
-#TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
 
 # Device Fstab
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
@@ -150,55 +136,65 @@ BOARD_SUPPRESS_SECURE_ERASE := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 
 # Verified Boot
-BOARD_AVB_ENABLE                           := true
-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS           += --flags 3
-BOARD_AVB_ROLLBACK_INDEX                   := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_RECOVERY_ALGORITHM               := SHA256_RSA4096
-BOARD_AVB_RECOVERY_KEY_PATH                := external/avb/test/data/testkey_rsa4096.pem
-BOARD_AVB_RECOVERY_ROLLBACK_INDEX          := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
-BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_ENABLE := true
 
-# TWRP Configurations
-TW_FRAMERATE := 60
-TW_STATUS_ICONS_ALIGN := center
+# Prune the full ncurses database after OrangeFox finishes preparing the
+# ramdisk, while retaining common terminal definitions.
+BOARD_RECOVERY_IMAGE_PREPARE = bash $(DEVICE_PATH)/fox_callback.sh $(TARGET_RECOVERY_ROOT_OUT) --first-call
+
+# OTA
+AB_OTA_UPDATER := true
+
+AB_OTA_PARTITIONS += \
+    boot \
+    init_boot \
+    vendor_boot \
+    dtbo \
+    vbmeta \
+    vbmeta_system \
+    vbmeta_vendor \
+    system \
+    system_ext \
+    system_dlkm \
+    vendor \
+    vendor_dlkm \
+    product \
+    odm \
+    odm_dlkm \
+    mi_ext
+
+# TW Configuration
 TW_THEME := portrait_hdpi
-TW_MAX_BRIGHTNESS := 255
-TW_NO_SCREEN_BLANK := true
-TWRP_NEW_THEME := true
-RECOVERY_SDCARD_ON_DATA := true
-TW_EXCLUDE_DEFAULT_USB_INIT := true
-TW_PREPARE_DATA_MEDIA_EARLY := true
-TW_EXCLUDE_APEX := true
-TW_EXTRA_LANGUAGES := true
-TW_DEFAULT_LANGUAGE := en
-TW_NO_BIND_SYSTEM := true
-TW_BACKUP_EXCLUSIONS := /data/fonts
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.usb0/lun.%d/file
-TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
-TW_NO_FLASH_CURRENT_TWRP := true
-
-# Fastbootd
+TARGET_SCREEN_WIDTH := 1268
+TARGET_SCREEN_HEIGHT := 2756
+TW_MAX_BRIGHTNESS := 2047
+TW_DEFAULT_BRIGHTNESS := 1000
+TW_USE_LEGACY_BATTERY_SERVICES := true
 TW_INCLUDE_FASTBOOTD := true
-
-# Debug
+TW_INCLUDE_LPTOOLS := true
+TW_INCLUDE_LPDUMP := true
+TW_INCLUDE_REPACKTOOLS := true
+TW_INCLUDE_RESETPROP := true
+TW_INCLUDE_EROFS := true
+TW_DEFAULT_LANGUAGE := en_US
+OF_LOAD_DEFAULT_LANGUAGE_BEFORE_DECRYPT := 1
+TW_HAS_MTP := true
+TW_MTP_DEVICE := /dev/mtp_usb
+TW_NO_USB_STORAGE := true
+TW_EXCLUDE_DEFAULT_USB_INIT := true
+TW_INPUT_BLACKLIST := "hbtp_vm"
+OF_SKIP_POST_DECRYPT_THEME_RELOAD := 1
 TARGET_USES_LOGD := true
 TWRP_INCLUDE_LOGCAT := true
+RECOVERY_SDCARD_ON_DATA := true
+BOARD_HAS_LARGE_FILESYSTEM := true
+TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_FBE := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
+TW_USE_FSCRYPT_POLICY := 2
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES = \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libtrusty.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libklee_libcxx_compat.so
 
-# Tools
-TW_INCLUDE_RESETPROP := true
-TW_INCLUDE_REPACKTOOLS := true
-TW_INCLUDE_LIBRESETPROP := true
-TW_INCLUDE_LPDUMP := true
-TW_INCLUDE_LPTOOLS := true
-
-# Filesystem Feature
-TW_INCLUDE_NTFS_3G := true
-TARGET_USES_MKE2FS := true
-TW_INCLUDE_FUSE_NTFS := true
-TW_INCLUDE_FUSE_EXFAT := true
-
-# Version
-TW_DEVICE_VERSION := klee-kylieeXD
-
+# Misc
 -include $(DEVICE_PATH)/fox_klee.mk
