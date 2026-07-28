@@ -35,6 +35,14 @@ jobs:
         with:
           path: device-tree
 
+      - name: Free up disk space
+        uses: rokibhasansagar/slimhub_actions@main
+
+      - name: Set swap space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 12
+
       - name: Install host packages
         shell: bash
         run: |
@@ -61,6 +69,7 @@ jobs:
         run: |
           df -h
           free -h
+          swapon --show
 
       - name: Sync OrangeFox
         shell: bash
