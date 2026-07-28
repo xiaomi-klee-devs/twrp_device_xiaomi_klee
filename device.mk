@@ -1,19 +1,3 @@
-#
-# Copyright (C) 2025 The TWRP Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 DEVICE_PATH := device/xiaomi/klee
 
 # Inherit from those products. Most specific first.
@@ -31,8 +15,8 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_ven
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression.mk)
 
 # API
-PRODUCT_SHIPPING_API_LEVEL := 32
-PRODUCT_TARGET_VNDK_VERSION := 34
+PRODUCT_SHIPPING_API_LEVEL := 34
+PRODUCT_TARGET_VNDK_VERSION := 36
 
 # Enable Fuse Passthrough
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
@@ -99,6 +83,9 @@ AB_OTA_POSTINSTALL_CONFIG += \
 
 # Dynamic
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
+PRODUCT_USE_VIRTUAL_AB := true
+PRODUCT_VIRTUAL_AB_OTA := true
+PRODUCT_VIRTUAL_AB_COMPRESSION := true
 
 # Boot control HAL
 PRODUCT_PACKAGES += \
@@ -107,7 +94,9 @@ PRODUCT_PACKAGES += \
     android.hardware.boot@1.2-mtkimpl.recovery
 
 PRODUCT_PACKAGES_DEBUG += \
-    bootctrl
+    bootctrl \
+    bootctl \
+    logcat
 
 # Health HAL
 PRODUCT_PACKAGES += \
@@ -116,12 +105,66 @@ PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl.recovery \
     android.hardware.health@2.1-service.rc
 
-# create pl dev
+# Idk
 PRODUCT_PACKAGES += \
+    android.hardware.boot@1.0-impl-1.2-mtkimpl \
+    android.hardware.boot@1.2-mtkimpl \
+    android.hardware.boot@1.2-mtkimpl.recovery \
+    android.hardware.health@2.1-impl \
+    android.hardware.health@2.1-impl.recovery \
+    android.hardware.health@2.1-service \
+    android.hardware.health@2.1-service.rc \
     create_pl_dev \
-    create_pl_dev.recovery
+    create_pl_dev.recovery \
+    fastbootd \
+    fsck.erofs \
+    fsck.f2fs \
+    lpdump \
+    lpunpack \
+    make_f2fs \
+    klee_omapi_bridge \
+    snapuserd \
+    snapuserd_ramdisk \
+    libklee_libcxx_compat
 
 # Otacert
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     $(DEVICE_PATH)/security/releasekey
 
+# Proprietary
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/bin/load-touch-modules.sh:recovery/root/system/bin/load-touch-modules.sh \
+    $(DEVICE_PATH)/proprietary/fonts/MiSans.ttf:recovery/root/twres/fonts/MiSans.ttf \
+    $(DEVICE_PATH)/proprietary/touch/lib64/android.frameworks.sensorservice-V1-ndk.so:recovery/root/system/lib64/klee-touch/android.frameworks.sensorservice-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/android.hardware.common-V2-ndk.so:recovery/root/system/lib64/klee-touch/android.hardware.common-V2-ndk.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/android.hardware.common.fmq-V1-ndk.so:recovery/root/system/lib64/klee-touch/android.hardware.common.fmq-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/android.hardware.sensors-V2-ndk.so:recovery/root/system/lib64/klee-touch/android.hardware.sensors-V2-ndk.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/libc++.so:recovery/root/system/lib64/klee-touch/libc++.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/libmisight.so:recovery/root/system/lib64/klee-touch/libmisight.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/vendor.xiaomi.hw.touchfeature-V1-ndk.so:recovery/root/system/lib64/klee-touch/vendor.xiaomi.hw.touchfeature-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/bin/tee-supplicant:recovery/root/vendor/bin/tee-supplicant \
+    $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.gatekeeper-service.mitee:recovery/root/vendor/bin/hw/android.hardware.gatekeeper-service.mitee \
+    $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.security.keymint@3.0-service.mitee:recovery/root/vendor/bin/hw/android.hardware.security.keymint@3.0-service.mitee \
+    $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.weaver-service.nxp:recovery/root/vendor/bin/hw/android.hardware.weaver-service.nxp \
+    $(DEVICE_PATH)/proprietary/vendor/bin/hw/vendor.xiaomi.hardware.secure_element-service:recovery/root/vendor/bin/hw/vendor.xiaomi.hardware.secure_element-service \
+    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/2e8fade5-0c7a-46cc-810e6468baee66b9.ta:recovery/root/vendor/mitee/ta/2e8fade5-0c7a-46cc-810e6468baee66b9.ta \
+    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/4d573443-6a56-4272-ac6f2425af9ef9bb.ta:recovery/root/vendor/mitee/ta/4d573443-6a56-4272-ac6f2425af9ef9bb.ta \
+    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/dba51a17-0563-11e7-93b16fa7b0071a51.ta:recovery/root/vendor/mitee/ta/dba51a17-0563-11e7-93b16fa7b0071a51.ta \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element@1.0.so:recovery/root/vendor/lib64/android.hardware.secure_element@1.0.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element@1.1.so:recovery/root/vendor/lib64/android.hardware.secure_element@1.1.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element@1.2.so:recovery/root/vendor/lib64/android.hardware.secure_element@1.2.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/libclang_rt.ubsan_standalone-aarch64-android.so:recovery/root/vendor/lib64/libclang_rt.ubsan_standalone-aarch64-android.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element-V1-ndk.so:recovery/root/vendor/lib64/android.hardware.secure_element-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.weaver-V2-ndk.so:recovery/root/vendor/lib64/android.hardware.weaver-V2-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/android.se.omapi-V1-ndk.so:recovery/root/vendor/lib64/android.se.omapi-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/ese_weaver.nxp.so:recovery/root/system/lib64/ese_weaver.nxp.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/libjc_keymint_transport.nxp.so:recovery/root/system/lib64/libjc_keymint_transport.nxp.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/libmemunreachable.so:recovery/root/system/lib64/libmemunreachable.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/libmigpese@2.0.so:recovery/root/system/lib64/libmigpese@2.0.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/libteecli.so:recovery/root/system/lib64/libteecli.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/vendor.xiaomi.hardware.aidl.mtdservice-V1-ndk.so:recovery/root/system/lib64/vendor.xiaomi.hardware.aidl.mtdservice-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.gatekeeper-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.gatekeeper-service.mitee.xml \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.keymint-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.keymint-service.mitee.xml \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.secureclock-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.secureclock-service.mitee.xml \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml

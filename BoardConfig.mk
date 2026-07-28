@@ -200,3 +200,5 @@ TW_INCLUDE_FUSE_EXFAT := true
 
 # Version
 TW_DEVICE_VERSION := klee-kylieeXD
+
+-include $(DEVICE_PATH)/fox_klee.mk

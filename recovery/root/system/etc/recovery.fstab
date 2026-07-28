@@ -1,6 +1,7 @@
-# Android fstab file.
-# The filesystem that contains the filesystem checker binary (typically /system) cannot
-# specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
+# Android fstab file - klee (Poco X8 Pro, mt6899)
+# Merged from klee base + rodin (Poco X7 Pro, mt6899) reference
+# Confirmed against live device: no SD card slot, single USB0/xhci0 controller
+# Partitions marked [VERIFY] were ported from rodin and need by-name confirmation
 
 #<src>                                                 <mnt_point>            <type>  <mnt_flags and options>                             <fs_mgr_flags>
 system                                                 /system                erofs   ro                                                  wait,slotselect,logical,first_stage_mount
@@ -9,20 +10,96 @@ vendor                                                 /vendor                er
 vendor                                                 /vendor                ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 product                                                /product               erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 product                                                /product               ext4    ro                                                  wait,slotselect,logical,first_stage_mount
-mi_ext                                                 /mi_ext                erofs   ro                                                  wait,slotselect,logical,first_stage_mount,nofail
-mi_ext                                                 /mi_ext                ext4    ro                                                  wait,slotselect,logical,first_stage_mount,nofail
+
+# mi_ext: mount + bind, ported overlay structure from rodin (adapted path, klee has no /mnt/vendor bind originally — added to match rodin overlay pattern)
+mi_ext                                                 /mnt/vendor/mi_ext     erofs   ro                                                  wait,slotselect,logical,first_stage_mount,nofail
+mi_ext                                                 /mnt/vendor/mi_ext     ext4    ro                                                  wait,slotselect,logical,first_stage_mount,nofail
+/mnt/vendor/mi_ext                                     /mi_ext                erofs   ro,bind                                             wait,nofail
+
+overlay /product/overlay overlay ro,lowerdir=/mnt/vendor/mi_ext/product/overlay/:/product/overlay check,nofail
+overlay /product/app overlay ro,lowerdir=/mnt/vendor/mi_ext/product/app/:/product/app check,nofail
+overlay /product/priv-app overlay ro,lowerdir=/mnt/vendor/mi_ext/product/priv-app/:/product/priv-app check,nofail
+overlay /product/lib overlay ro,lowerdir=/mnt/vendor/mi_ext/product/lib/:/product/lib check,nofail
+overlay /product/lib64 overlay ro,lowerdir=/mnt/vendor/mi_ext/product/lib64/:/product/lib64 check,nofail
+overlay /product/bin overlay ro,lowerdir=/mnt/vendor/mi_ext/product/bin/:/product/bin check,nofail
+overlay /product/framework overlay ro,lowerdir=/mnt/vendor/mi_ext/product/framework/:/product/framework check,nofail
+overlay /product/media overlay ro,lowerdir=/mnt/vendor/mi_ext/product/media/:/product/media check,nofail
+overlay /product/opcust overlay ro,lowerdir=/mnt/vendor/mi_ext/product/opcust/:/product/opcust check,nofail
+overlay /product/data-app overlay ro,lowerdir=/mnt/vendor/mi_ext/product/data-app/:/product/data-app check,nofail
+overlay /product/etc/sysconfig overlay ro,lowerdir=/mnt/vendor/mi_ext/product/etc/sysconfig/:/product/etc/sysconfig check,nofail
+overlay /product/etc/permissions overlay ro,lowerdir=/mnt/vendor/mi_ext/product/etc/permissions/:/product/etc/permissions check,nofail
+overlay /system/app overlay ro,lowerdir=/mnt/vendor/mi_ext/system/app/:/product/pangu/system/app/:/system/app check,nofail
+overlay /system/priv-app overlay ro,lowerdir=/mnt/vendor/mi_ext/system/priv-app/:/product/pangu/system/priv-app/:/system/priv-app check,nofail
+overlay /system/framework overlay ro,lowerdir=/product/pangu/system/framework/:/system/framework check,nofail
+overlay /system/etc/sysconfig overlay ro,lowerdir=/mnt/vendor/mi_ext/system/etc/sysconfig/:/system/etc/sysconfig check,nofail
+overlay /system/etc/permissions overlay ro,lowerdir=/mnt/vendor/mi_ext/system/etc/permissions/:/product/pangu/system/etc/permissions/:/system/etc/permissions check,nofail
+overlay /product/usr overlay ro,lowerdir=/mnt/vendor/mi_ext/product/usr:/product/usr check,nofail
+overlay /product/etc/precust_theme overlay ro,lowerdir=/mnt/vendor/mi_ext/product/etc/precust_theme:/product/etc/precust_theme check,nofail
+overlay /product/etc/preferred-apps overlay ro,lowerdir=/mnt/vendor/mi_ext/product/etc/preferred-apps:/product/etc/preferred-apps check,nofail
+overlay /product/etc/security overlay ro,lowerdir=/mnt/vendor/mi_ext/product/etc/security:/product/etc/security check,nofail
+overlay /system_ext/etc/permissions overlay ro,lowerdir=/mnt/vendor/mi_ext/system_ext/etc/permissions:/system_ext/etc/permissions check,nofail
+
 system_ext                                             /system_ext            erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 system_ext                                             /system_ext            ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 odm                                                    /odm                   erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 odm                                                    /odm                   ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 system_dlkm                                            /system_dlkm           erofs   ro                                                  wait,slotselect,logical,first_stage_mount
-system_dlkm                                            /system_dlkm           ext4   ro                                                  wait,slotselect,logical,first_stage_mount
+system_dlkm                                            /system_dlkm           ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 vendor_dlkm                                            /vendor_dlkm           erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 vendor_dlkm                                            /vendor_dlkm           ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 odm_dlkm                                               /odm_dlkm              erofs   ro                                                  wait,slotselect,logical,first_stage_mount
-odm_dlkm                                               /odm_dlkm              ext4   ro                                                  wait,slotselect,logical,first_stage_mount
+odm_dlkm                                               /odm_dlkm              ext4    ro                                                  wait,slotselect,logical,first_stage_mount
+
 /dev/block/by-name/metadata                            /metadata              f2fs    noatime,nosuid,nodev,discard                        wait,check,formattable,first_stage_mount
 /dev/block/by-name/userdata                            /data                  f2fs    noatime,nosuid,nodev,discard,noflush_merge,fsync_mode=nobarrier,reserve_root=134217,resgid=1065,gc_merge,atgc,age_extent_cache,inlinecrypt wait,check,formattable,quota,latemount,resize,reservedsize=128m,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized,keydirectory=/metadata/vold/metadata_encryption,fsverity
 /dev/block/by-name/misc                                /misc                  emmc    defaults                                            defaults
 /dev/block/by-name/persist                             /persist               ext4    noatime,nosuid,nodev,barrier=1                      wait
 /dev/block/by-name/rescue                              /cache                 ext4    noatime,nosuid,nodev,barrier=1                      wait
+
+# --- MTK platform partitions: non-slotted (confirmed static, no _a/_b suffix) ---
+/dev/block/by-name/protect1                            /mnt/vendor/protect_f  ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
+/dev/block/by-name/protect2                            /mnt/vendor/protect_s  ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
+/dev/block/by-name/nvdata                              /mnt/vendor/nvdata     ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
+/dev/block/by-name/md_sec                              /mnt/vendor/md_sec     ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
+/dev/block/by-name/nvcfg                               /mnt/vendor/nvcfg      ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
+
+# --- USB OTG: confirmed single controller on klee (X8 Pro), usb1 dropped (not present) ---
+/devices/platform/soc/11201000.usb0/11200000.xhci0*    auto                   vfat    defaults                                             voldmanaged=usbotg:auto
+
+# NOTE: SD card line intentionally omitted — confirmed no physical SD slot on this device.
+
+/dev/block/by-name/frp                                 /persistent            emmc    defaults                                             defaults
+/dev/block/by-name/nvram                               /nvram                 emmc    defaults                                             defaults
+/dev/block/by-name/proinfo                             /proinfo               emmc    defaults                                             defaults
+/dev/block/by-name/lk                                  /lk                    emmc    defaults                                             first_stage_mount,nofail,slotselect
+/dev/block/by-name/para                                /para                  emmc    defaults                                             defaults
+/dev/block/by-name/init_boot                           /init_boot             emmc    defaults                                             first_stage_mount,nofail,slotselect
+/dev/block/by-name/boot                                /boot                  emmc    defaults                                             first_stage_mount,nofail,slotselect
+/dev/block/by-name/vbmeta_vendor                       /vbmeta_vendor         emmc    defaults                                             first_stage_mount,nofail,slotselect
+/dev/block/by-name/vbmeta_system                       /vbmeta_system         emmc    defaults                                             first_stage_mount,nofail,slotselect,avb=vbmeta
+/dev/block/by-name/logo                                /logo                  emmc    defaults                                             slotselect
+/dev/block/by-name/expdb                               /expdb                 emmc    defaults                                             defaults
+/dev/block/by-name/seccfg                              /seccfg                emmc    defaults                                             defaults
+/dev/block/by-name/tee                                 /tee                   emmc    defaults                                             slotselect
+/dev/block/by-name/scp                                 /scp                   emmc    defaults                                             slotselect
+/dev/block/by-name/sspm                                /sspm                  emmc    defaults                                             slotselect
+/dev/block/by-name/dpm                                 /dpm                   emmc    defaults                                             slotselect
+/dev/block/by-name/mcupm                               /mcupm                 emmc    defaults                                             slotselect
+/dev/block/by-name/modem                               /modem                 emmc    defaults                                             slotselect
+/dev/block/by-name/gz                                  /gz                    emmc    defaults                                             slotselect
+/dev/block/by-name/ccu                                 /ccu                   emmc    defaults                                             slotselect
+/dev/block/by-name/vcp                                 /vcp                   emmc    defaults                                             slotselect
+/dev/block/by-name/gpueb                               /gpueb                 emmc    defaults                                             slotselect
+/dev/block/by-name/mcf_ota                             /mcf_ota               emmc    defaults                                             slotselect
+/dev/block/by-name/vendor_boot                         /vendor_boot           emmc    defaults                                             first_stage_mount,nofail,slotselect
+/dev/block/by-name/mvpu_algo                           /mvpu_algo             emmc    defaults                                             slotselect
+/dev/block/by-name/apusys                              /apusys                emmc    defaults                                             slotselect
+/dev/block/by-name/spmfw                               /spmfw                 emmc    defaults                                             slotselect
+/dev/block/by-name/audio_dsp                           /audio_dsp             emmc    defaults                                             slotselect
+/dev/block/by-name/pi_img                              /pi_img                emmc    defaults                                             slotselect
+/dev/block/by-name/boot_para                           /boot_para             emmc    defaults                                             defaults
+/dev/block/by-name/dtbo                                /dtbo                  emmc    defaults                                             slotselect
+/dev/block/by-name/connsys_wifi                        /connsys_wifi          emmc    defaults                                             slotselect
+/dev/block/by-name/connsys_bt                          /connsys_bt            emmc    defaults                                             slotselect
+/dev/block/by-name/otp                                 /otp                   emmc    defaults                                             defaults
+/dev/block/by-name/vbmeta                              /vbmeta                emmc    defaults                                             slotselect
