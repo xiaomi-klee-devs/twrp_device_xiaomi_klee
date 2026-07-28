@@ -153,15 +153,28 @@ jobs:
           set -euo pipefail
           PRODUCT="$GITHUB_WORKSPACE/OrangeFox/out/target/product/klee"
 
-          find "$PRODUCT" -maxdepth 4 -type f | sort | tee "$GITHUB_WORKSPACE/product_files.txt" || true
+          echo "::group::Full product file tree"
+          find "$PRODUCT" -type f | sort | tee "$GITHUB_WORKSPACE/product_files.txt" || true
+          echo "::endgroup::"
+
+          echo "::group::Inside the OrangeFox flashable zip"
+          ZIP="$(find "$PRODUCT" -maxdepth 1 -name '*.zip' | head -n1)"
+          if [ -n "$ZIP" ]; then
+            unzip -l "$ZIP" | tee "$GITHUB_WORKSPACE/zip_contents.txt" || true
+          else
+            echo "No zip found at $PRODUCT"
+          fi
+          echo "::endgroup::"
 
           RECOVERY_CPIO=""
 
+          # Known candidate paths from older/AB device trees
           for f in \
             "$PRODUCT/vendor_ramdisk_recovery.cpio" \
             "$PRODUCT/obj/PACKAGING/vendor_ramdisk_fragments_intermediates/recovery.cpio.lz4" \
             "$PRODUCT/obj/PACKAGING/vendor_boot_intermediates/vendor_ramdisk.cpio.lz4" \
-            "$PRODUCT/ramdisk-recovery.img"
+            "$PRODUCT/ramdisk-recovery.img" \
+            "$PRODUCT/ramdisk-recovery.cpio"
           do
             if [ -f "$f" ]; then
               RECOVERY_CPIO="$f"
@@ -169,22 +182,32 @@ jobs:
             fi
           done
 
+          # Fallback: search by name pattern anywhere under $PRODUCT
           if [ -z "$RECOVERY_CPIO" ]; then
-            echo "::error::No recovery ramdisk found"
-            exit 1
+            RECOVERY_CPIO="$(find "$PRODUCT" -type f \( -iname "*recovery*ramdisk*" -o -iname "*ramdisk*recovery*" -o -iname "recovery.cpio*" \) | head -n1)"
           fi
 
-          echo "$RECOVERY_CPIO" > "$GITHUB_WORKSPACE/recovery_cpio_path.txt"
-          ls -lh "$RECOVERY_CPIO"
+          if [ -z "$RECOVERY_CPIO" ]; then
+            echo "::warning::No standalone recovery ramdisk cpio found. Check zip_contents.txt / product_files.txt artifacts -- this device tree may already output a ready vendor_boot.img or recovery.img directly, in which case the manual repack step is unnecessary and should be skipped."
+            echo "" > "$GITHUB_WORKSPACE/recovery_cpio_path.txt"
+          else
+            echo "$RECOVERY_CPIO" > "$GITHUB_WORKSPACE/recovery_cpio_path.txt"
+            ls -lh "$RECOVERY_CPIO"
+          fi
 
       - name: Repack stock vendor_boot with OrangeFox recovery
         shell: bash
         run: |
           set -euo pipefail
 
+          RECOVERY_CPIO="$(cat "$GITHUB_WORKSPACE/recovery_cpio_path.txt" 2>/dev/null || true)"
+          if [ -z "$RECOVERY_CPIO" ]; then
+            echo "::warning::Skipping manual vendor_boot repack -- no standalone recovery cpio was found. Check the zip_contents.txt artifact for a ready-made vendor_boot.img/recovery.img instead."
+            exit 0
+          fi
+
           PRODUCT="$GITHUB_WORKSPACE/OrangeFox/out/target/product/klee"
           STOCK="$GITHUB_WORKSPACE/OrangeFox/device/xiaomi/klee/prebuilt/vendor_boot_stock.img"
-          RECOVERY_CPIO="$(cat "$GITHUB_WORKSPACE/recovery_cpio_path.txt")"
           OUT="$PRODUCT/vendor_boot_patched.img"
           UNPACK="$PRODUCT/stock_vendor_boot"
 
@@ -239,6 +262,7 @@ jobs:
           cp -v "$GITHUB_WORKSPACE/orangefox-build.log" "$GITHUB_WORKSPACE/artifacts/" || true
           cp -v "$GITHUB_WORKSPACE/vendor_boot_patched_info.txt" "$GITHUB_WORKSPACE/artifacts/" || true
           cp -v "$GITHUB_WORKSPACE/product_files.txt" "$GITHUB_WORKSPACE/artifacts/" || true
+          cp -v "$GITHUB_WORKSPACE/zip_contents.txt" "$GITHUB_WORKSPACE/artifacts/" || true
           cp -v "$GITHUB_WORKSPACE/recovery_cpio_path.txt" "$GITHUB_WORKSPACE/artifacts/" || true
 
       - name: Upload artifacts
