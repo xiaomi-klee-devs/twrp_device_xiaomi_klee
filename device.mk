@@ -4,9 +4,6 @@ DEVICE_PATH := device/xiaomi/klee
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 
-# Installs gsi keys into ramdisk, to boot a developer GSI with verified boot.
-$(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
-
 # Enable project quotas and casefolding for emulated storage without sdcardfs
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
@@ -126,10 +123,6 @@ PRODUCT_PACKAGES += \
     snapuserd \
     snapuserd_ramdisk \
     libklee_libcxx_compat
-
-# Otacert
-PRODUCT_EXTRA_RECOVERY_KEYS += \
-    $(DEVICE_PATH)/security/releasekey
 
 # Proprietary
 PRODUCT_COPY_FILES += \
