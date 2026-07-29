@@ -41,22 +41,6 @@ export LC_ALL="${LC_ALL:-C}"
 swap_kb="$(awk '/^SwapTotal:/ { print $2 }' /proc/meminfo)"
 swap_gb="$(awk -v kb="${swap_kb}" 'BEGIN { printf "%.1f GB", kb / 1024 / 1024 }')"
 min_swap_kb=$((12 * 1024 * 1024))
-if [ "${OF_SKIP_SWAP_CHECK:-0}" != "1" ] && [ "${swap_kb}" -lt "${min_swap_kb}" ]; then
-    cat >&2 <<EOF
-Swap is too small for this low-memory Android build.
-Current swap: ${swap_gb}
-Recommended: at least 12 GB, preferably 16 GB
-
-Add temporary swap, then rerun:
-  sudo fallocate -l 16G /swap-build.img
-  sudo chmod 600 /swap-build.img
-  sudo mkswap /swap-build.img
-  sudo swapon /swap-build.img
-
-To bypass this check anyway, set OF_SKIP_SWAP_CHECK=1.
-EOF
-    exit 1
-fi
 
 renice -n 15 -p "$$" >/dev/null 2>&1 || true
 ionice -c3 -p "$$" >/dev/null 2>&1 || true
