@@ -162,21 +162,8 @@ jobs:
             -b main \
             -m default.xml
 
-          (
-            while sleep 60; do
-              date -u '+%Y-%m-%dT%H:%M:%SZ sync heartbeat'
-              df -h "$GITHUB_WORKSPACE"
-              free -h
-            done
-          ) &
-          heartbeat_pid=$!
-          trap 'kill "$heartbeat_pid" 2>/dev/null || true' EXIT
-
           repo sync -c -j4 --retry-fetches=3 \
             --no-clone-bundle --no-tags --optimized-fetch
-
-          kill "$heartbeat_pid" 2>/dev/null || true
-          trap - EXIT
 
       - name: Apply OrangeFox setup patches
         shell: bash
@@ -274,21 +261,8 @@ jobs:
           export SOONG_UI_NINJA_ARGS="$NINJA_ARGS"
           printf 'Using %s Ninja jobs\n' "$build_jobs"
 
-          (
-            while sleep 60; do
-              date -u '+%Y-%m-%dT%H:%M:%SZ build heartbeat'
-              df -h "$GITHUB_WORKSPACE"
-              free -h
-            done
-          ) &
-          heartbeat_pid=$!
-          trap 'kill "$heartbeat_pid" 2>/dev/null || true' EXIT
-
           device/xiaomi/klee/build-lowmem.sh vendorbootimage 2>&1 | \
             tee "$GITHUB_WORKSPACE/orangefox-build.log"
-
-          kill "$heartbeat_pid" 2>/dev/null || true
-          trap - EXIT
 
       - name: Validate release image
         shell: bash
