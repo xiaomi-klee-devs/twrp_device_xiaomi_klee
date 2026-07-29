@@ -104,9 +104,13 @@ fi
 "$MKBOOTFS" -d "${PRODUCT_OUT}/system" "$platform_root" > "$platform_pruned_cpio"
 "$LZ4" -l -12 --favor-decSpeed -f "$platform_pruned_cpio" "$platform_pruned_lz4" >/dev/null
 
+VENDOR_BOOT_PARTITION_SIZE=67108864
+HEADER_AND_FOOTER_OVERHEAD=1048576
+
+max_ramdisk_size=$(( VENDOR_BOOT_PARTITION_SIZE - $(stat -c %s "$STOCK_DTB") - HEADER_AND_FOOTER_OVERHEAD ))
 total_ramdisk_size=$(( $(stat -c %s "$platform_pruned_lz4") + $(stat -c %s "$RECOVERY_LZ4") ))
-if [ "$total_ramdisk_size" -ge 60000000 ]; then
-    echo "combined vendor ramdisk is $total_ramdisk_size bytes; expected less than 60000000" >&2
+if [ "$total_ramdisk_size" -ge "$max_ramdisk_size" ]; then
+    echo "combined vendor ramdisk is $total_ramdisk_size bytes; expected less than $max_ramdisk_size" >&2
     exit 1
 fi
 
@@ -129,13 +133,12 @@ fi
 fingerprint="$(cat "${PRODUCT_OUT}/build_fingerprint.txt")"
 "$AVBTOOL" add_hash_footer \
     --image "$unsigned_image" \
-    --partition_size 67108864 \
+    --partition_size "$VENDOR_BOOT_PARTITION_SIZE" \
     --partition_name vendor_boot \
     --prop "com.android.build.vendor_boot.fingerprint:${fingerprint}"
 
 mkdir -p "$(dirname "$OUTPUT_IMAGE")"
 mv -f "$unsigned_image" "$OUTPUT_IMAGE"
-sha256sum "$OUTPUT_IMAGE" > "${OUTPUT_IMAGE}.sha256"
 
 # OrangeFox creates these names before this post-build step. Replace both
 # whole-image outputs so an ordinary vendorbootimage build cannot leave a
@@ -149,11 +152,3 @@ md5sum "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.img" \
 rm -f \
     "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.zip" \
     "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.zip.md5"
-
-printf 'system-compatible vendor_boot: %s\n' "$OUTPUT_IMAGE"
-printf 'firmware variant: %s\n' "$FIRMWARE_VARIANT"
-printf 'pruned stock platform fragment: %s bytes (LZ4, %s stock modules)\n' \
-    "$(stat -c %s "$platform_pruned_lz4")" "$platform_module_count"
-printf 'recovery fragment: %s bytes (LZ4, %s modules)\n' "$(stat -c %s "$RECOVERY_LZ4")" "$module_count"
-printf 'combined vendor ramdisk: %s bytes\n' "$total_ramdisk_size"
-cat "${OUTPUT_IMAGE}.sha256"
