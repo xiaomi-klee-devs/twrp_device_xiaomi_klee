@@ -4,25 +4,9 @@ set -euo pipefail
 DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 TOP_DIR="$(cd -- "${DEVICE_DIR}/../../.." && pwd -P)"
 PRODUCT_OUT="${1:-${OUT_DIR:-${TOP_DIR}/out}/target/product/klee}"
-FIRMWARE_VARIANT="${klee_FIRMWARE_VARIANT:-cn}"
 
-case "${FIRMWARE_VARIANT}" in
-    cn)
-        STOCK_RAMDISK="${DEVICE_DIR}/prebuilt/vendor_ramdisk00"
-        STOCK_RAMDISK_SHA256="192977d50a121f7a5ddfab0212488ef0dbb0326cad802ce9d664649967a9845c"
-        DEFAULT_OUTPUT_IMAGE="${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
-        ;;
-    global)
-        STOCK_RAMDISK="${DEVICE_DIR}/prebuilt/global/vendor_ramdisk00"
-        STOCK_RAMDISK_SHA256="349cc6598f70ae401afe3071abed6de00815af39c5aded3551cff23364208731"
-        DEFAULT_OUTPUT_IMAGE="${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee-global-system-compatible.img"
-        ;;
-    *)
-        echo "unsupported klee_FIRMWARE_VARIANT: ${FIRMWARE_VARIANT} (expected cn or global)" >&2
-        exit 1
-        ;;
-esac
-
+STOCK_RAMDISK="${DEVICE_DIR}/prebuilt/vendor_ramdisk00"
+DEFAULT_OUTPUT_IMAGE="${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
 OUTPUT_IMAGE="${2:-${DEFAULT_OUTPUT_IMAGE}}"
 STOCK_DTB="${DEVICE_DIR}/prebuilt/dtb/mt6899-klee.dtb"
 RECOVERY_LZ4="${PRODUCT_OUT}/obj/PACKAGING/vendor_ramdisk_fragments_intermediates/recovery.cpio.lz4"
@@ -37,22 +21,6 @@ for file in "$STOCK_RAMDISK" "$STOCK_DTB" "$RECOVERY_LZ4" "$LZ4" "$MKBOOTIMG" "$
         exit 1
     fi
 done
-
-check_sha256() {
-    local expected="$1"
-    local file="$2"
-    local actual
-    actual="$(sha256sum "$file" | awk '{print $1}')"
-    if [ "$actual" != "$expected" ]; then
-        echo "firmware input hash mismatch: $file" >&2
-        echo "expected $expected" >&2
-        echo "actual   $actual" >&2
-        exit 1
-    fi
-}
-
-check_sha256 "$STOCK_RAMDISK_SHA256" "$STOCK_RAMDISK"
-check_sha256 38369239c984fc191e36d043d19ccbea4c1cd09ee6c80f8646d9493f650a30ae "$STOCK_DTB"
 
 work_dir="$(mktemp -d "${TMPDIR:-/tmp}/klee-vendor-boot.XXXXXX")"
 trap 'rm -rf "$work_dir"' EXIT

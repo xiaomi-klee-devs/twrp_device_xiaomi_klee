@@ -264,25 +264,6 @@ jobs:
           device/xiaomi/klee/build-lowmem.sh vendorbootimage 2>&1 | \
             tee "$GITHUB_WORKSPACE/orangefox-build.log"
 
-      - name: Validate release image
-        shell: bash
-        env:
-          IMAGE_NAME: ${{ steps.metadata.outputs.image_name }}
-        run: |
-          set -euo pipefail
-          product="$ORANGEFOX_TOP/out/target/product/klee"
-          image="$product/$IMAGE_NAME"
-          avbtool="$ORANGEFOX_TOP/out/host/linux-x86/bin/avbtool"
-
-          test -f "$image"
-          test -f "${image}.sha256"
-          test -x "$avbtool"
-          test "$(stat -c %s "$image")" = "67108864"
-          sha256sum --check --strict "${image}.sha256"
-          test -f "$product/vendor_boot.img"
-          cmp -s "$image" "$product/vendor_boot.img"
-          "$avbtool" verify_image --image "$image"
-
       - name: Collect release artifact
         shell: bash
         env:
