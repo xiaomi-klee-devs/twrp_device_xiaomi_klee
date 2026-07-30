@@ -126,6 +126,11 @@ PRODUCT_PACKAGES += \
 
 # Proprietary
 PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/init.recovery.bootctl.rc:recovery/root/init.recovery.bootctl.rc \
+    $(DEVICE_PATH)/recovery/root/init.recovery.hardware.rc:recovery/root/init.recovery.hardware.rc \
+    $(DEVICE_PATH)/recovery/root/init.recovery.keymint.rc:recovery/root/init.recovery.keymint.rc \
+    $(DEVICE_PATH)/recovery/root/init.recovery.mt6899.rc:recovery/root/init.recovery.mt6899.rc \
+    $(DEVICE_PATH)/recovery/root/init.recovery.project.rc:recovery/root/init.recovery.project.rc \
     $(DEVICE_PATH)/recovery/root/system/bin/load-touch-modules.sh:recovery/root/system/bin/load-touch-modules.sh \
     $(DEVICE_PATH)/proprietary/fonts/MiSans.ttf:recovery/root/twres/fonts/MiSans.ttf \
     $(DEVICE_PATH)/proprietary/touch/lib64/android.frameworks.sensorservice-V1-ndk.so:recovery/root/system/lib64/klee-touch/android.frameworks.sensorservice-V1-ndk.so \
