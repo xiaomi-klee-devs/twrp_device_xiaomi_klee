@@ -208,6 +208,13 @@ jobs:
           "$ORANGEFOX_TOP/device/xiaomi/klee/tools/apply-orangefox-patches.sh" \
             "$ORANGEFOX_TOP"
 
+      - name: Apply weaver patch
+        shell: bash
+        run: |
+          cp "$ORANGEFOX_TOP"/device/xiaomi/klee/patches/orangefox_weaver_fallback.patch "$ORANGEFOX_TOP"/system/vold
+          cd "$ORANGEFOX_TOP"/system/vold
+          patch -p1 < orangefox_weaver_fallback.patch
+
       - name: Drop sync metadata
         shell: bash
         run: |
