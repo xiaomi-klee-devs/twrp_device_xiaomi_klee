@@ -132,6 +132,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/init.recovery.mt6899.rc:recovery/root/init.recovery.mt6899.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.project.rc:recovery/root/init.recovery.project.rc \
     $(DEVICE_PATH)/recovery/root/system/bin/load-touch-modules.sh:recovery/root/system/bin/load-touch-modules.sh \
+    $(DEVICE_PATH)/proprietary/odm/bin/hw/vendor.xiaomi.hw.touchfeature-service-recovery:recovery/root/system/bin/vendor.xiaomi.hw.touchfeature-service-recovery \
     $(DEVICE_PATH)/proprietary/fonts/MiSans.ttf:recovery/root/twres/fonts/MiSans.ttf \
     $(DEVICE_PATH)/proprietary/touch/lib64/android.frameworks.sensorservice-V1-ndk.so:recovery/root/system/lib64/klee-touch/android.frameworks.sensorservice-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/android.hardware.common-V2-ndk.so:recovery/root/system/lib64/klee-touch/android.hardware.common-V2-ndk.so \
@@ -139,6 +140,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/touch/lib64/android.hardware.sensors-V2-ndk.so:recovery/root/system/lib64/klee-touch/android.hardware.sensors-V2-ndk.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/libc++.so:recovery/root/system/lib64/klee-touch/libc++.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/libmisight.so:recovery/root/system/lib64/klee-touch/libmisight.so \
+    $(DEVICE_PATH)/proprietary/touch/lib64/libmisight.so:recovery/root/vendor/lib64/libmisight.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/vendor.xiaomi.hw.touchfeature-V1-ndk.so:recovery/root/system/lib64/klee-touch/vendor.xiaomi.hw.touchfeature-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/vendor/bin/tee-supplicant:recovery/root/vendor/bin/tee-supplicant \
     $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.gatekeeper-service.mitee:recovery/root/vendor/bin/hw/android.hardware.gatekeeper-service.mitee \
