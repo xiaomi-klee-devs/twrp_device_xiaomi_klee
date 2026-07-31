@@ -141,6 +141,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/touch/lib64/libc++.so:recovery/root/system/lib64/klee-touch/libc++.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/libmisight.so:recovery/root/system/lib64/klee-touch/libmisight.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/libmisight.so:recovery/root/vendor/lib64/libmisight.so \
+    $(DEVICE_PATH)/proprietary/odm/lib64/vendor.xiaomi.hardware.miauthsecretd-V1-ndk.so:recovery/root/vendor/lib64/vendor.xiaomi.hardware.miauthsecretd-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/touch/lib64/vendor.xiaomi.hw.touchfeature-V1-ndk.so:recovery/root/system/lib64/klee-touch/vendor.xiaomi.hw.touchfeature-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/vendor/bin/tee-supplicant:recovery/root/vendor/bin/tee-supplicant \
     $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.gatekeeper-service.mitee:recovery/root/vendor/bin/hw/android.hardware.gatekeeper-service.mitee \
