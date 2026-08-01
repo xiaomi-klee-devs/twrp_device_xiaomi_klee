@@ -33,16 +33,6 @@ service vendor.secure_element_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.
     seclabel u:r:recovery:s0
     disabled
 
-service miweaver_hal_service /odm/bin/hw/android.hardware.weaver
-    class hal
-    user  system
-    group system drmrpc
-    capabilities WAKE_ALARM
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
-    seclabel u:r:recovery:s0
-    disabled
-
 service klee.omapi_bridge /system/bin/klee_omapi_bridge
     class hal
     user system
@@ -66,7 +56,6 @@ service miweaver_hal_service /odm/bin/hw/vendor.xiaomi.hardware.authsecretd
     class hal
     user  system
     group system drmrpc
-    oneshot
     disabled
     interface aidl vendor.xiaomi.hardware.miauthsecretd.IMIAuthSecret/default
     interface aidl vendor.xiaomi.hardware.miauthsecretd.ICpaceService/default
