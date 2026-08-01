@@ -1,14 +1,111 @@
 name: Build and publish OrangeFox klee
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       publish:
         description: Create a prerelease with vendor_boot images
         required: true
+        default: true
+        type: boolean
+      run_checkout:
+        description: 'Step: Check out device tree'
+        required: false
+        default: true
+        type: boolean
+      run_metadata:
+        description: 'Step: Set build metadata'
+        required: false
+        default: true
+        type: boolean
+      run_remove_worktree:
+        description: 'Step: Remove stale build worktree'
+        required: false
+        default: true
+        type: boolean
+      run_free_disk:
+        description: 'Step: Free disk space'
+        required: false
+        default: true
+        type: boolean
+      run_set_swap:
+        description: 'Step: Set swap space'
+        required: false
+        default: true
+        type: boolean
+      run_packages:
+        description: 'Step: Install host packages'
+        required: false
+        default: true
+        type: boolean
+      run_setup_swap:
+        description: 'Step: Setup build swap'
+        required: false
+        default: true
+        type: boolean
+      run_capacity:
+        description: 'Step: Check runner capacity'
+        required: false
+        default: true
+        type: boolean
+      run_repo_tool:
+        description: 'Step: Install repo tool'
+        required: false
+        default: true
+        type: boolean
+      run_sync:
+        description: 'Step: Sync OrangeFox sources'
+        required: false
+        default: true
+        type: boolean
+      run_setup_patches:
+        description: 'Step: Apply OrangeFox setup patches'
+        required: false
+        default: true
+        type: boolean
+      run_install_devicetree:
+        description: 'Step: Install klee device tree'
+        required: false
+        default: true
+        type: boolean
+      run_apply_patches:
+        description: 'Step: Apply source patches & verify'
+        required: false
+        default: true
+        type: boolean
+      run_weaver_patch:
+        description: 'Step: Apply weaver patch'
+        required: false
+        default: true
+        type: boolean
+      run_drop_sync:
+        description: 'Step: Drop sync metadata'
+        required: false
+        default: true
+        type: boolean
+      run_build_vendorboot:
+        description: 'Step: Build vendor_boot image'
+        required: false
+        default: true
+        type: boolean
+      run_collect_artifact:
+        description: 'Step: Collect release artifact'
+        required: false
+        default: true
+        type: boolean
+      run_upload_release_artifact:
+        description: 'Step: Upload release artifact'
+        required: false
+        default: true
+        type: boolean
+      run_upload_diag:
+        description: 'Step: Upload build diagnostics'
+        required: false
+        default: true
+        type: boolean
+      run_clean:
+        description: 'Step: Clean build worktree'
+        required: false
         default: true
         type: boolean
 
@@ -27,13 +124,12 @@ env:
 
 jobs:
   build:
-    # Hosted image layouts vary. The first steps reclaim unrelated payloads,
-    # then verify the observed capacity before building at low concurrency.
-    runs-on: ubuntu-24.04
+    runs-on: self-hosted
     timeout-minutes: 360
 
     steps:
       - name: Check out device tree
+        if: ${{ inputs.run_checkout != false }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -41,6 +137,7 @@ jobs:
 
       - name: Set build metadata
         id: metadata
+        if: ${{ inputs.run_metadata != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -51,6 +148,7 @@ jobs:
           echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
 
       - name: Remove stale build worktree
+        if: ${{ inputs.run_remove_worktree != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -61,17 +159,18 @@ jobs:
           rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
             "$GITHUB_WORKSPACE/orangefox-build.log"
 
-      # This is the cleaner used by Klee's known-working hosted workflow.
-      # It removes substantially more hosted-image payload than apt cleanup.
       - name: Free disk space
+        if: ${{ inputs.run_free_disk != false }}
         uses: rokibhasansagar/slimhub_actions@main
 
       - name: Set swap space
+        if: ${{ inputs.run_set_swap != false }}
         uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 12
 
       - name: Install host packages
+        if: ${{ inputs.run_packages != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -90,14 +189,15 @@ jobs:
           echo "JAVA_HOME=${java_home}" >> "$GITHUB_ENV"
 
       - name: Setup build swap
+        if: ${{ inputs.run_setup_swap != false }}
         shell: bash
         run: |
           set -euo pipefail
-          # setup-swap.sh creates only the missing capacity plus a header margin.
           MIN_SWAP_GIB=12 \
             bash "$GITHUB_WORKSPACE/device-tree/.github/scripts/setup-swap.sh"
 
       - name: Check runner capacity
+        if: ${{ inputs.run_capacity != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -123,6 +223,7 @@ jobs:
           free -h
 
       - name: Install repo tool
+        if: ${{ inputs.run_repo_tool != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -134,6 +235,7 @@ jobs:
           echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Sync OrangeFox sources
+        if: ${{ inputs.run_sync != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -149,9 +251,6 @@ jobs:
           git -C "$manifest_repo" add default.xml
           git -C "$manifest_repo" commit --quiet -m "Pinned OrangeFox 14.1 manifest"
           git config --global protocol.file.allow always
-          # GitLab occasionally resets long HTTP/2 fetches from hosted runners.
-          # Keep the transport reproducible and tolerate slow pack transfers.
-          # git config --global http.version HTTP/1.1
           git config --global http.lowSpeedLimit 1
           git config --global http.lowSpeedTime 600
 
@@ -166,6 +265,7 @@ jobs:
             --no-clone-bundle --no-tags --optimized-fetch
 
       - name: Apply OrangeFox setup patches
+        if: ${{ inputs.run_setup_patches != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -191,6 +291,7 @@ jobs:
               "$boardconfig"
 
       - name: Install klee device tree
+        if: ${{ inputs.run_install_devicetree != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -202,6 +303,7 @@ jobs:
             "$ORANGEFOX_TOP/device/xiaomi/klee/"
 
       - name: Apply source patches & verify
+        if: ${{ inputs.run_apply_patches != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -209,6 +311,7 @@ jobs:
             "$ORANGEFOX_TOP"
 
       - name: Apply weaver patch
+        if: ${{ inputs.run_weaver_patch != false }}
         shell: bash
         run: |
           cp "$ORANGEFOX_TOP"/device/xiaomi/klee/patches/orangefox_weaver_fallback.patch "$ORANGEFOX_TOP"/system/vold
@@ -216,6 +319,7 @@ jobs:
           patch -p1 < orangefox_weaver_fallback.patch
 
       - name: Drop sync metadata
+        if: ${{ inputs.run_drop_sync != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -226,27 +330,8 @@ jobs:
           df -h "$GITHUB_WORKSPACE"
           free -h
 
-      - name: Check compilation capacity
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # slimhub reclaims about 138 GiB on the standard hosted image. A
-          # full pinned source checkout leaves about 45 GiB after .repo is
-          # removed; this low-memory, single-job build requires a 35 GiB floor
-          # before Soong starts writing out/.
-          available_kib="$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')"
-          required_kib=$((35 * 1024 * 1024))
-          if [[ -z "${available_kib}" || "${available_kib}" -lt "${required_kib}" ]]; then
-            available_gib=$((available_kib / 1024 / 1024))
-            echo "::error::OrangeFox klee needs at least 35 GiB free after .repo cleanup; found ${available_gib} GiB."
-            exit 1
-          fi
-
-          du -sh "$ORANGEFOX_TOP"
-          df -h "$GITHUB_WORKSPACE"
-
       - name: Build vendor_boot image
+        if: ${{ inputs.run_build_vendorboot != false }}
         shell: bash
         working-directory: ${{ env.ORANGEFOX_TOP }}
         env:
@@ -272,6 +357,7 @@ jobs:
             tee "$GITHUB_WORKSPACE/orangefox-build.log"
 
       - name: Collect release artifact
+        if: ${{ inputs.run_collect_artifact != false }}
         shell: bash
         env:
           IMAGE_NAME: ${{ steps.metadata.outputs.image_name }}
@@ -299,6 +385,7 @@ jobs:
           EOF
 
       - name: Upload release artifact
+        if: ${{ inputs.run_upload_release_artifact != false }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.metadata.outputs.artifact_name }}
@@ -307,7 +394,7 @@ jobs:
           retention-days: 30
 
       - name: Upload build diagnostics
-        if: always()
+        if: ${{ always() && inputs.run_upload_diag != false }}
         uses: actions/upload-artifact@v4
         with:
           name: orangefox-klee-logs-${{ github.run_id }}-${{ github.run_attempt }}
@@ -318,7 +405,7 @@ jobs:
           retention-days: 14
 
       - name: Clean build worktree
-        if: always()
+        if: ${{ always() && inputs.run_clean != false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -330,7 +417,7 @@ jobs:
             "$GITHUB_WORKSPACE/orangefox-build.log"
 
   release:
-    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) }}
+    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' && inputs.publish) }}
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 30
