@@ -79,7 +79,12 @@ on fs
 on property:init.svc.tee-supplicant=running
     start vendor.keymint-mitee
     start vendor.secure_element_hal_service
-    start vendor.weaver_nxp
 
 on property:init.svc.vendor.secure_element_hal_service=running
     start klee.omapi_bridge
+
+on property:init.svc.klee.omapi_bridge=running
+    start vendor.miauthsecretd
+
+on property:init.svc.vendor.miauthsecretd=running
+    start vendor.weaver_nxp

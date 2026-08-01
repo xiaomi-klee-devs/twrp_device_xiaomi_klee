@@ -151,9 +151,6 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/vendor/mitee/ta/2e8fade5-0c7a-46cc-810e6468baee66b9.ta:recovery/root/vendor/mitee/ta/2e8fade5-0c7a-46cc-810e6468baee66b9.ta \
     $(DEVICE_PATH)/proprietary/vendor/mitee/ta/4d573443-6a56-4272-ac6f2425af9ef9bb.ta:recovery/root/vendor/mitee/ta/4d573443-6a56-4272-ac6f2425af9ef9bb.ta \
     $(DEVICE_PATH)/proprietary/vendor/mitee/ta/dba51a17-0563-11e7-93b16fa7b0071a51.ta:recovery/root/vendor/mitee/ta/dba51a17-0563-11e7-93b16fa7b0071a51.ta \
-    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/2e8fade5-0c7a-46cc-810e6468baee66b9.ta:recovery/root/odm/mitee/ta/2e8fade5-0c7a-46cc-810e6468baee66b9.ta \
-    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/4d573443-6a56-4272-ac6f2425af9ef9bb.ta:recovery/root/odm/mitee/ta/4d573443-6a56-4272-ac6f2425af9ef9bb.ta \
-    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/dba51a17-0563-11e7-93b16fa7b0071a51.ta:recovery/root/odm/mitee/ta/dba51a17-0563-11e7-93b16fa7b0071a51.ta \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element@1.0.so:recovery/root/vendor/lib64/android.hardware.secure_element@1.0.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element@1.1.so:recovery/root/vendor/lib64/android.hardware.secure_element@1.1.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element@1.2.so:recovery/root/vendor/lib64/android.hardware.secure_element@1.2.so \
@@ -162,6 +159,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.weaver-V2-ndk.so:recovery/root/vendor/lib64/android.hardware.weaver-V2-ndk.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.se.omapi-V1-ndk.so:recovery/root/vendor/lib64/android.se.omapi-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/ese_weaver.nxp.so:recovery/root/system/lib64/ese_weaver.nxp.so \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/ese_weaver.nxp.so:recovery/root/vendor/lib64/ese_weaver.nxp.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/libjc_keymint_transport.nxp.so:recovery/root/system/lib64/libjc_keymint_transport.nxp.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/libmemunreachable.so:recovery/root/system/lib64/libmemunreachable.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/libmigpese@2.0.so:recovery/root/system/lib64/libmigpese@2.0.so \
