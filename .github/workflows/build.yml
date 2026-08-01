@@ -29,7 +29,7 @@ jobs:
   build:
     # Hosted image layouts vary. The first steps reclaim unrelated payloads,
     # then verify the observed capacity before building at low concurrency.
-    runs-on: ubuntu-24.04
+    runs-on: self-hosted
     timeout-minutes: 360
 
     steps:
@@ -49,45 +49,6 @@ jobs:
 
           echo "artifact_name=orangefox-klee-release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
           echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
-
-      - name: Remove stale build worktree
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf "$ORANGEFOX_TOP" \
-            "$GITHUB_WORKSPACE/ofox-sync" \
-            "$GITHUB_WORKSPACE/pinned-manifest" \
-            "$GITHUB_WORKSPACE/artifacts"
-          rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
-            "$GITHUB_WORKSPACE/orangefox-build.log"
-
-      # This is the cleaner used by Klee's known-working hosted workflow.
-      # It removes substantially more hosted-image payload than apt cleanup.
-      - name: Free disk space
-        uses: rokibhasansagar/slimhub_actions@main
-
-      - name: Set swap space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 12
-
-      - name: Install host packages
-        shell: bash
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            bc bison build-essential ccache cpio curl flex g++-multilib \
-            gcc-multilib git git-lfs gnupg gperf imagemagick \
-            lib32ncurses-dev lib32readline-dev lib32z1-dev libelf-dev \
-            liblz4-tool libncurses-dev libsdl1.2-dev libssl-dev libxml2 \
-            libxml2-utils lz4 openjdk-17-jdk-headless pngcrush \
-            python-is-python3 python3 ripgrep rsync schedtool squashfs-tools \
-            unzip xsltproc zip zlib1g-dev
-          sudo apt-get clean
-          java_home="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
-          test -x "${java_home}/bin/java"
-          echo "JAVA_HOME=${java_home}" >> "$GITHUB_ENV"
 
       - name: Setup build swap
         shell: bash
@@ -121,17 +82,6 @@ jobs:
 
           df -h "$GITHUB_WORKSPACE"
           free -h
-
-      - name: Install repo tool
-        shell: bash
-        run: |
-          set -euo pipefail
-          install -d "$HOME/bin"
-          curl --fail --location --retry 5 --retry-all-errors \
-            https://storage.googleapis.com/git-repo-downloads/repo \
-            --output "$HOME/bin/repo"
-          chmod +x "$HOME/bin/repo"
-          echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Sync OrangeFox sources
         shell: bash
@@ -316,18 +266,6 @@ jobs:
             OrangeFox/out/logs
           if-no-files-found: warn
           retention-days: 14
-
-      - name: Clean build worktree
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf "$ORANGEFOX_TOP" \
-            "$GITHUB_WORKSPACE/ofox-sync" \
-            "$GITHUB_WORKSPACE/pinned-manifest" \
-            "$GITHUB_WORKSPACE/artifacts"
-          rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
-            "$GITHUB_WORKSPACE/orangefox-build.log"
 
   release:
     if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) }}
