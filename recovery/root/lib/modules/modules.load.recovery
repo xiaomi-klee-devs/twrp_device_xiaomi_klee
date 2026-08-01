@@ -139,6 +139,8 @@ mi_i2c-dev.ko
 mtk-i3c-master-mt69xx.ko
 mtk_dramc.ko
 spi-mt65xx.ko
+nxp_i2c.ko
+p73.ko
 mt6375.ko
 extdev_io_class.ko
 rt4803.ko
