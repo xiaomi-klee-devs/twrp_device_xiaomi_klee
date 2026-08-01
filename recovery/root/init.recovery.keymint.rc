@@ -33,6 +33,11 @@ service vendor.secure_element_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.
     seclabel u:r:recovery:s0
     disabled
 
+service miweaver_hal_service /odm/bin/hw/android.hardware.weaver
+    class hal
+    user  system
+    group system drmrpc
+
 service klee.omapi_bridge /system/bin/klee_omapi_bridge
     class hal
     user system
@@ -88,3 +93,4 @@ on property:init.svc.klee.omapi_bridge=running
 
 on property:init.svc.vendor.miauthsecretd=running
     start vendor.weaver_nxp
+    start miweaver_hal_service

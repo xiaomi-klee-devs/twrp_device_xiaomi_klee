@@ -164,6 +164,7 @@ AB_OTA_PARTITIONS += \
     mi_ext
 
 # TW Configuration
+TW_FRAMERATE := 60
 TW_THEME := portrait_hdpi
 TARGET_SCREEN_WIDTH := 1268
 TARGET_SCREEN_HEIGHT := 2756
