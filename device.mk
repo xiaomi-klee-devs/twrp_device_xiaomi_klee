@@ -169,4 +169,6 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.keymint-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.keymint-service.mitee.xml \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.secureclock-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.secureclock-service.mitee.xml \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml \
-    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml \
+    $(DEVICE_PATH)/proprietary/odm/bin/hw/android.hardware.weaver:recovery/root/vendor/odm/bin/hw/android.hardware.weaver \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml:recovery/root/vendor/odm/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml
