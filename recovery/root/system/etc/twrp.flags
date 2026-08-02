@@ -57,7 +57,7 @@
 /pi_img             emmc      /dev/block/by-name/pi_img                                             flags=display="pi_img"
 
 # Removable Storage
-/usb_otg            auto  /dev/block/sda1 /dev/block/sda /dev/block/sdd1 flags=display="USB-OTG";storage;wipeingui;removable
+/usb_otg            auto  /dev/block/sdd1 flags=display="USB-OTG";storage;wipeingui;removable
 
 # Flashable logical partitions
 /system_image	         emmc		/dev/block/mapper/system								  flags=display="System Image";slotselect;backup;flashimg

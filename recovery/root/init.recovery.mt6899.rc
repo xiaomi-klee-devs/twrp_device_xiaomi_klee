@@ -13,7 +13,15 @@ service load-touch-module /sbin/sh /system/bin/load-touch-module.sh
     disabled
     seclabel u:r:recovery:s0
 
+service load-usb-storage-module /sbin/sh /system/bin/load-usb-storage-module.sh
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
 on boot
     start boot-hal-1-2
     start health-hal-2-1
     start load-touch-module
+    start load-usb-storage-module
