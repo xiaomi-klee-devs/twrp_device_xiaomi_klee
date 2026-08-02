@@ -14,6 +14,7 @@ LZ4="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/lz4"
 MKBOOTIMG="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootimg"
 MKBOOTFS="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootfs"
 AVBTOOL="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/avbtool"
+DTB_PATCHER="${DEVICE_DIR}/tools/patch-vendor-boot-dtb.py"
 
 for file in "$STOCK_RAMDISK" "$STOCK_DTB" "$RECOVERY_LZ4" "$LZ4" "$MKBOOTIMG" "$MKBOOTFS" "$AVBTOOL"; do
     if [ ! -f "$file" ]; then
@@ -31,9 +32,57 @@ platform_root="${work_dir}/platform-root"
 platform_pruned_cpio="${work_dir}/platform-pruned.cpio"
 platform_pruned_lz4="${work_dir}/platform-pruned.cpio.lz4"
 unsigned_image="${work_dir}/vendor_boot.img"
+patched_dtb="${work_dir}/mt6899-klee-no-usb-offload.dtb"
 
+python3 "$DTB_PATCHER" --input "$STOCK_DTB" --output "$patched_dtb"
 "$LZ4" -d -f "$RECOVERY_LZ4" "$recovery_cpio" >/dev/null
 "$LZ4" -d -f "$STOCK_RAMDISK" "$platform_cpio" >/dev/null
+
+verify_recovery_elf() {
+    local cpio_file="$1" archive_path="$2" extracted_file
+
+    extracted_file="${work_dir}/$(basename "$archive_path")"
+    if ! cpio -it --quiet < "$cpio_file" | grep -E "^(\./)?${archive_path}$" >/dev/null; then
+        echo "recovery ramdisk is missing required ELF: $archive_path" >&2
+        exit 1
+    fi
+    cpio -i --quiet --to-stdout "$archive_path" < "$cpio_file" > "$extracted_file"
+    python3 - "$extracted_file" "$archive_path" <<'PY'
+import pathlib
+import sys
+
+library = pathlib.Path(sys.argv[1])
+archive_path = sys.argv[2]
+if library.read_bytes()[:4] != b"\x7fELF":
+    raise SystemExit(f"recovery ramdisk has invalid ELF: {archive_path}")
+PY
+}
+
+verify_recovery_elf "$recovery_cpio" system/lib64/libprocessgroup_setup.so
+
+verify_otg_platform_stack() {
+    local root="$1" module
+
+    for module in \
+        charger_class.ko \
+        extcon-mtk-usb.ko \
+        mt6375-charger.ko \
+        mtk_charger_framework.ko \
+        mtu3.ko \
+        tcpc_class.ko \
+        tcpc_mt6375.ko \
+        xhci-mtk-hcd-v2.ko; do
+        if [ ! -f "$root/lib/modules/$module" ]; then
+            echo "${FIRMWARE_VARIANT} platform ramdisk is missing OTG module: $module" >&2
+            exit 1
+        fi
+    done
+
+    if ! strings -a "$root/lib/modules/extcon-mtk-usb.ko" | grep -qx 'vbus_switch'; then
+        echo "${FIRMWARE_VARIANT} extcon-mtk-usb lacks the vbus_switch control" >&2
+        exit 1
+    fi
+}
 
 module_count="$(cpio -it --quiet < "$recovery_cpio" | awk '/^lib\/modules\/.*\.ko$/ { count++ } END { print count + 0 }')"
 if [ "$module_count" -gt 7 ]; then
@@ -95,6 +144,8 @@ for essential in \
     fi
 done
 
+
+
 platform_module_count="$(find "$platform_root/lib/modules" -maxdepth 1 -type f -name '*.ko' | wc -l)"
 if [ "$platform_module_count" -ne 244 ]; then
     echo "pruned platform contains $platform_module_count modules; expected 244" >&2
@@ -115,7 +166,7 @@ if [ "$total_ramdisk_size" -ge "$max_ramdisk_size" ]; then
 fi
 
 "$MKBOOTIMG" \
-    --dtb "$STOCK_DTB" \
+    --dtb "$patched_dtb" \
     --base 0x3fff8000 \
     --pagesize 4096 \
     --vendor_cmdline "bootopt=64S3,32N2,64N2 erofs.reserved_pages=64" \
