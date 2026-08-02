@@ -52,17 +52,6 @@ service vendor.weaver_nxp /vendor/bin/hw/android.hardware.weaver-service.nxp
     seclabel u:r:recovery:s0
     disabled
 
-service miweaver_hal_service /odm/bin/hw/vendor.xiaomi.hardware.authsecretd
-    class hal
-    user  system
-    group system drmrpc
-    disabled
-    interface aidl vendor.xiaomi.hardware.miauthsecretd.IMIAuthSecret/default
-    interface aidl vendor.xiaomi.hardware.miauthsecretd.ICpaceService/default
-    setenv LD_LIBRARY_PATH /system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
-    seclabel u:r:recovery:s0
-
 on fs
     mkdir /mnt/vendor/persist 0755 root root
     mount ext4 /dev/block/by-name/persist /mnt/vendor/persist ro noatime nosuid nodev wait noload
@@ -90,6 +79,5 @@ on fs
 on property:init.svc.tee-supplicant=running
     start vendor.keymint-mitee
     start vendor.secure_element_hal_service
-    start miweaver_hal_service
     start vendor.weaver_nxp
     start klee.omapi_bridge
