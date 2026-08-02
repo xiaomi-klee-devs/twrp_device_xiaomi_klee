@@ -78,6 +78,11 @@ on:
         required: false
         default: true
         type: boolean
+      run_apex_patch:
+        description: 'Step: Apply apex patch'
+        required: false
+        default: true
+        type: boolean
       run_drop_sync:
         description: 'Step: Drop sync metadata'
         required: false
@@ -317,6 +322,14 @@ jobs:
           cp "$ORANGEFOX_TOP"/device/xiaomi/klee/patches/orangefox_weaver_fallback.patch "$ORANGEFOX_TOP"/system/vold
           cd "$ORANGEFOX_TOP"/system/vold
           patch -p1 < orangefox_weaver_fallback.patch
+
+      - name: Apply apex patch
+        if: ${{ inputs.run_apex_patch != false }}
+        shell: bash
+        run: |
+          cp "$ORANGEFOX_TOP"/device/xiaomi/klee/patches/orangefox_apex_fallback.patch "$ORANGEFOX_TOP"/bootable/recovery
+          cd "$ORANGEFOX_TOP"/bootable/recovery
+          patch -p1 < orangefox_apex_fallback.patch
 
       - name: Drop sync metadata
         if: ${{ inputs.run_drop_sync != false }}
