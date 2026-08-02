@@ -35,7 +35,6 @@ AB_OTA_PARTITIONS += \
     gpueb \
     gz \
     lk \
-    logo \
     mcf_ota \
     mcupm \
     md1img \
@@ -43,7 +42,6 @@ AB_OTA_PARTITIONS += \
     odm \
     odm_dlkm \
     pi_img \
-    preloader_raw \
     product \
     scp \
     spmfw \
