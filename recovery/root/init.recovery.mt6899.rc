@@ -1,13 +1,6 @@
 import /init.recovery.bootctl.rc
 import /init.recovery.keymint.rc
 
-service klee-touchfeature /system/bin/vendor.xiaomi.hw.touchfeature-service-recovery
-    disabled
-    user root
-    group root input system
-    setenv LD_LIBRARY_PATH /system/lib64/klee-touch:/system/lib64:/vendor/lib64:/odm/lib64
-    seclabel u:r:recovery:s0
-
 on init
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.configfs 1
@@ -20,9 +13,6 @@ service load-touch-module /sbin/sh /system/bin/load-touch-module.sh
     disabled
     seclabel u:r:recovery:s0
 
-on early-boot
-    start klee-touchfeature
-	
 on boot
     start boot-hal-1-2
     start health-hal-2-1
