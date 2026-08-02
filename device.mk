@@ -46,11 +46,6 @@ PRODUCT_VIRTUAL_AB_OTA := true
 PRODUCT_VIRTUAL_AB_COMPRESSION := true
 
 # Boot control HAL
-PRODUCT_PACKAGES += \
-    android.hardware.boot@1.2-mtkimpl \
-    android.hardware.boot@1.0-impl-1.2-mtkimpl \
-    android.hardware.boot@1.2-mtkimpl.recovery
-
 PRODUCT_PACKAGES_DEBUG += \
     bootctrl \
     bootctl \
@@ -65,9 +60,6 @@ PRODUCT_PACKAGES += \
 
 # Idk
 PRODUCT_PACKAGES += \
-    android.hardware.boot@1.0-impl-1.2-mtkimpl \
-    android.hardware.boot@1.2-mtkimpl \
-    android.hardware.boot@1.2-mtkimpl.recovery \
     android.hardware.health@2.1-impl \
     android.hardware.health@2.1-impl.recovery \
     android.hardware.health@2.1-service \
