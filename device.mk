@@ -173,4 +173,5 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/odm/bin/hw/android.hardware.weaver:recovery/root/vendor/odm/bin/hw/android.hardware.weaver \
     $(DEVICE_PATH)/proprietary/odm/lib64/vendor.xiaomi.hardware.cpace-V1-ndk.so:recovery/root/vendor/odm/lib64/vendor.xiaomi.hardware.cpace-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/odm/bin/hw/vendor.xiaomi.hardware.authsecretd:recovery/root/vendor/odm/bin/hw/vendor.xiaomi.hardware.authsecretd \
-    $(DEVICE_PATH)/proprietary/odm/etc/vintf/manifest/vendor.xiaomi.hardware.authsecretd.xml:recovery/root/vendor/odm/etc/vintf/manifest/vendor.xiaomi.hardware.authsecretd.xml
+    $(DEVICE_PATH)/proprietary/odm/etc/vintf/manifest/vendor.xiaomi.hardware.authsecretd.xml:recovery/root/vendor/odm/etc/vintf/manifest/vendor.xiaomi.hardware.authsecretd.xml \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/libc++.so:recovery/root/vendor/odm/lib64/libc++.so
