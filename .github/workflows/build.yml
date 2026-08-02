@@ -187,7 +187,7 @@ jobs:
             liblz4-tool libncurses-dev libsdl1.2-dev libssl-dev libxml2 \
             libxml2-utils lz4 openjdk-17-jdk-headless pngcrush \
             python-is-python3 python3 ripgrep rsync schedtool squashfs-tools \
-            unzip xsltproc zip zlib1g-dev
+            unzip xsltproc zip zlib1g-dev device-tree-compiler
           sudo apt-get clean
           java_home="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
           test -x "${java_home}/bin/java"
