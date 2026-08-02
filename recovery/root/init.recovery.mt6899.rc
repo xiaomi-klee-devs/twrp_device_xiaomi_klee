@@ -20,9 +20,6 @@ service load-touch-module /sbin/sh /system/bin/load-touch-module.sh
     disabled
     seclabel u:r:recovery:s0
 
-on early-boot
-    start klee-touchfeature
-	
 on boot
     start boot-hal-1-2
     start health-hal-2-1
