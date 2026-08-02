@@ -1,4 +1,7 @@
 on post-fs
+    wait /dev/block/sda 5
+    wait /dev/block/sdb 5
+
     start create_pl_dev
 
     wait /dev/block/mapper/preloader_raw_a
