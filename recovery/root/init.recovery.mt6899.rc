@@ -1,9 +1,6 @@
 import /init.recovery.bootctl.rc
 import /init.recovery.keymint.rc
 
-on early-init
-    write /sys/fs/selinux/enforce 0
-
 service klee-touchfeature /system/bin/vendor.xiaomi.hw.touchfeature-service-recovery
     disabled
     user root
