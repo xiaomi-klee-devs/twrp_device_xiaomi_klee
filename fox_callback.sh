@@ -30,7 +30,7 @@ if [ -d "$ramdisk/lib/modules" ]; then
     find "$ramdisk/lib/modules" -maxdepth 1 -type f -name '*.ko' -print0 |
         while IFS= read -r -d '' module; do
             case "$(basename "$module")" in
-                nt38771_touch_klee.ko|xiaomi_touch_klee.ko|nxp_i2c.ko|p73.ko|scp.ko|usb_offload.ko)
+                nt38771_touch_klee.ko|xiaomi_touch_klee.ko|nxp_i2c.ko|p73.ko|scp.ko|usb_offload.ko|mediatek-drm.ko|panel-p10-36-02-0a-dsc-vdo.ko|panel-p10-42-02-0b-dsc-vdo.ko|mtk_battery_manager.ko)
                     ;;
                 *)
                     rm -f "$module"
