@@ -145,8 +145,8 @@ for essential in \
 done
 
 platform_module_count="$(find "$platform_root/lib/modules" -maxdepth 1 -type f -name '*.ko' | wc -l)"
-if [ "$platform_module_count" -ne 244 ]; then
-    echo "pruned platform contains $platform_module_count modules; expected 244" >&2
+if [ "$platform_module_count" -ne 243 ]; then
+    echo "pruned platform contains $platform_module_count modules; expected 243" >&2
     exit 1
 fi
 
