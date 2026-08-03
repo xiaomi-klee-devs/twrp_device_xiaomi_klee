@@ -139,8 +139,6 @@ mi_i2c-dev.ko
 mtk-i3c-master-mt69xx.ko
 mtk_dramc.ko
 spi-mt65xx.ko
-nxp_i2c.ko
-p73.ko
 mt6375.ko
 extdev_io_class.ko
 rt4803.ko
@@ -190,7 +188,12 @@ mtk_battery_manager.ko
 pmic_lbat_service.ko
 pmic_lvsys_notify.ko
 reset-ti-syscon.ko
+adsp.ko
+mtk_slbc.ko
+slbc_ipi.ko
+slbc_trace.ko
 arm_dsu_pmu.ko
+mtk-swpm-perf-arm-pmu.ko
 emi.ko
 emi-mpu.ko
 smpu.ko
@@ -221,6 +224,9 @@ sec.ko
 uload_ind.ko
 load_track.ko
 perf_helper.ko
+nxp_i2c.ko
+p73.ko
+tms_device_modules.ko
 zsmalloc.ko
 zram.ko
 mi_stack.ko
