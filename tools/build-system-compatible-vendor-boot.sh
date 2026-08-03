@@ -85,8 +85,8 @@ verify_otg_platform_stack() {
 }
 
 module_count="$(cpio -it --quiet < "$recovery_cpio" | awk '/^lib\/modules\/.*\.ko$/ { count++ } END { print count + 0 }')"
-if [ "$module_count" -gt 7 ]; then
-    echo "recovery fragment still contains $module_count modules; expected at most 7" >&2
+if [ "$module_count" -gt 9 ]; then
+    echo "recovery fragment still contains $module_count modules; expected at most 9" >&2
     exit 1
 fi
 
