@@ -144,7 +144,7 @@ BOARD_RECOVERY_IMAGE_PREPARE = bash $(DEVICE_PATH)/fox_callback.sh $(TARGET_RECO
 
 # OTA
 AB_OTA_UPDATER := true
-
+OF_USE_AIDL_BOOT_CONTROL := 1
 AB_OTA_PARTITIONS += \
     boot \
     init_boot \
