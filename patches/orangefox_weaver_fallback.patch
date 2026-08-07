@@ -1,0 +1,62 @@
+diff --git a/Weaver1.cpp b/Weaver1.cpp
+index a2eeaaa..068e0f1 100644
+--- a/Weaver1.cpp
++++ b/Weaver1.cpp
+@@ -33,6 +33,8 @@
+ #include <android/hardware/weaver/1.0/IWeaver.h>
+ #include <aidl/android/hardware/weaver/IWeaver.h>
+ 
++#include <chrono>
++#include <thread>
+ #include <iostream>
+ #define ERROR 1
+ #define LOG(x) std::cout
+@@ -50,12 +52,45 @@ using ::android::sp;
+ namespace android {
+ namespace vold {
+ 
++// AServiceManager_waitForService() blocks forever with no timeout. In
++// recovery, if the vendor weaver HAL never registers (e.g. it hangs on
++// its own SE/TEE dependency), this permanently freezes OrangeFox at the
++// boot logo. Poll with a bounded timeout instead so we fail gracefully
++// and let the caller fall back (Decrypt.cpp already checks `if (!weaver)`).
++static const int kWeaverWaitTimeoutMs = 5000;   // tweak as needed
++static const int kWeaverPollIntervalMs = 200;
++
++static AIBinder* WaitForServiceWithTimeout(const std::string& instance, int timeout_ms) {
++	AIBinder* binder = AServiceManager_checkService(instance.c_str());
++	if (binder != nullptr)
++		return binder;
++
++	int waited_ms = 0;
++	while (waited_ms < timeout_ms) {
++		std::this_thread::sleep_for(std::chrono::milliseconds(kWeaverPollIntervalMs));
++		waited_ms += kWeaverPollIntervalMs;
++		binder = AServiceManager_checkService(instance.c_str());
++		if (binder != nullptr) {
++			LOG(ERROR) << "Weaver: service " << instance << " appeared after " << waited_ms << "ms\n";
++			return binder;
++		}
++	}
++	LOG(ERROR) << "Weaver: timed out after " << timeout_ms << "ms waiting for " << instance << ", giving up\n";
++	return nullptr;
++}
++
+ Weaver::Weaver() {
+     const std::string instance = std::string(::aidl::android::hardware::weaver::IWeaver::descriptor) + "/default";
+-    AIBinder* binder = AServiceManager_waitForService(instance.c_str());
+-    mAidlDevice = ::aidl::android::hardware::weaver::IWeaver::fromBinder(ndk::SpAIBinder(binder));
++    AIBinder* binder = WaitForServiceWithTimeout(instance, kWeaverWaitTimeoutMs);
++    if (binder != nullptr) {
++        mAidlDevice = ::aidl::android::hardware::weaver::IWeaver::fromBinder(ndk::SpAIBinder(binder));
++    }
+ 	if (mAidlDevice == nullptr) {
+-		mDevice = ::android::hardware::weaver::V1_0::IWeaver::getService();
++		// tryGetService() returns immediately (nullptr if absent) instead of
++		// blocking forever like getService() does when the HIDL entry isn't
++		// in the manifest. Keeps the "fallback to gatekeeper-only" path in
++		// Decrypt.cpp reachable instead of freezing here.
++		mDevice = ::android::hardware::weaver::V1_0::IWeaver::tryGetService();
+ 	}
+ 	GottenConfig = false;
+ }
