@@ -1,0 +1,377 @@
+name: Build and publish OrangeFox klee
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Create a prerelease with vendor_boot images
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orangefox-klee-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ORANGEFOX_BRANCH: '14.1'
+  ORANGEFOX_SYNC_REVISION: '11e4406b2bd1de939a26b6bfbad7e371cc3b1fa7'
+  ORANGEFOX_TOP: ${{ github.workspace }}/OrangeFox
+  OF_BUILD_JOBS: '1'
+
+jobs:
+  build:
+    # Hosted image layouts vary. The first steps reclaim unrelated payloads,
+    # then verify the observed capacity before building at low concurrency.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Check out device tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          path: device-tree
+
+      - name: Set build metadata
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          image_name="OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
+
+          echo "artifact_name=orangefox-klee-release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+          echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
+
+      - name: Remove stale build worktree
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$ORANGEFOX_TOP" \
+            "$GITHUB_WORKSPACE/ofox-sync" \
+            "$GITHUB_WORKSPACE/pinned-manifest" \
+            "$GITHUB_WORKSPACE/artifacts"
+          rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
+            "$GITHUB_WORKSPACE/orangefox-build.log"
+
+      # This is the cleaner used by Klee's known-working hosted workflow.
+      # It removes substantially more hosted-image payload than apt cleanup.
+      - name: Free disk space
+        uses: rokibhasansagar/slimhub_actions@main
+
+      - name: Set swap space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 12
+
+      - name: Install host packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bc bison build-essential ccache cpio curl flex g++-multilib \
+            gcc-multilib git git-lfs gnupg gperf imagemagick \
+            lib32ncurses-dev lib32readline-dev lib32z1-dev libelf-dev \
+            liblz4-tool libncurses-dev libsdl1.2-dev libssl-dev libxml2 \
+            libxml2-utils lz4 openjdk-17-jdk-headless pngcrush \
+            python-is-python3 python3 ripgrep rsync schedtool squashfs-tools \
+            unzip xsltproc zip zlib1g-dev
+          sudo apt-get clean
+          java_home="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
+          test -x "${java_home}/bin/java"
+          echo "JAVA_HOME=${java_home}" >> "$GITHUB_ENV"
+
+      - name: Setup build swap
+        shell: bash
+        run: |
+          set -euo pipefail
+          # setup-swap.sh creates only the missing capacity plus a header margin.
+          MIN_SWAP_GIB=12 \
+            bash "$GITHUB_WORKSPACE/device-tree/.github/scripts/setup-swap.sh"
+
+      - name: Check runner capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          available_kib="$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')"
+          required_kib=$((95 * 1024 * 1024))
+          if [[ -z "${available_kib}" || "${available_kib}" -lt "${required_kib}" ]]; then
+            available_gib=$((available_kib / 1024 / 1024))
+            echo "::error::OrangeFox klee needs at least 95 GiB free after hosted-image cleanup and swap setup; found ${available_gib} GiB."
+            echo "::error::Use a GitHub-hosted larger runner if this public standard runner image cannot meet the guard."
+            exit 1
+          fi
+
+          memory_kib="$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)"
+          required_memory_kib=$((14 * 1024 * 1024))
+          if [[ -z "${memory_kib}" || "${memory_kib}" -lt "${required_memory_kib}" ]]; then
+            memory_gib=$((memory_kib / 1024 / 1024))
+            echo "::error::This workflow needs a public 16 GB-class GitHub-hosted runner; found ${memory_gib} GiB RAM."
+            exit 1
+          fi
+
+          df -h "$GITHUB_WORKSPACE"
+          free -h
+
+      - name: Install repo tool
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d "$HOME/bin"
+          curl --fail --location --retry 5 --retry-all-errors \
+            https://storage.googleapis.com/git-repo-downloads/repo \
+            --output "$HOME/bin/repo"
+          chmod +x "$HOME/bin/repo"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Sync OrangeFox sources
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          manifest_repo="$GITHUB_WORKSPACE/pinned-manifest"
+          export GIT_CONFIG_GLOBAL="$GITHUB_WORKSPACE/ci-gitconfig"
+          mkdir -p "$manifest_repo"
+          cp "$GITHUB_WORKSPACE/device-tree/manifests/orangefox-fox_14.1-pinned.xml" \
+            "$manifest_repo/default.xml"
+          git -C "$manifest_repo" init --initial-branch=main --quiet
+          git -C "$manifest_repo" config user.name "OrangeFox CI"
+          git -C "$manifest_repo" config user.email "orangefox-ci@localhost"
+          git -C "$manifest_repo" add default.xml
+          git -C "$manifest_repo" commit --quiet -m "Pinned OrangeFox 14.1 manifest"
+          git config --global protocol.file.allow always
+          # GitLab occasionally resets long HTTP/2 fetches from hosted runners.
+          # Keep the transport reproducible and tolerate slow pack transfers.
+          # git config --global http.version HTTP/1.1
+          git config --global http.lowSpeedLimit 1
+          git config --global http.lowSpeedTime 600
+
+          mkdir -p "$ORANGEFOX_TOP"
+          cd "$ORANGEFOX_TOP"
+          repo init --depth=1 \
+            -u "file://${manifest_repo}" \
+            -b main \
+            -m default.xml
+
+          repo sync -c -j4 --retry-fetches=3 \
+            --no-clone-bundle --no-tags --optimized-fetch
+
+      - name: Apply OrangeFox setup patches
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sync_dir="$GITHUB_WORKSPACE/ofox-sync"
+          git clone --filter=blob:none https://gitlab.com/OrangeFox/sync.git "$sync_dir"
+          git -C "$sync_dir" checkout --detach "$ORANGEFOX_SYNC_REVISION"
+          test "$(git -C "$sync_dir" rev-parse HEAD)" = "$ORANGEFOX_SYNC_REVISION"
+
+          vold_patch="$sync_dir/patches/patch-vold-fox_14.1.diff"
+          test "$(sha256sum "$vold_patch" | awk '{print $1}')" = \
+            "29b4b0b387c3185a3dcc69f141a3c84969510547d13ed2de71eefa8423c57778"
+          if git -C "$ORANGEFOX_TOP/system/vold" apply --reverse --check "$vold_patch" 2>/dev/null; then
+            echo "OrangeFox system/vold patch is already applied"
+          else
+            git -C "$ORANGEFOX_TOP/system/vold" apply --check "$vold_patch"
+            git -C "$ORANGEFOX_TOP/system/vold" apply "$vold_patch"
+          fi
+
+          boardconfig="$ORANGEFOX_TOP/vendor/twrp/config/BoardConfigSoong.mk"
+          grep -qx 'include bootable/recovery/orangefox_soong.mk' "$boardconfig" || \
+            sed -i '/SOONG_CONFIG_NAMESPACES += twrpVarsPlugin/i include bootable/recovery/orangefox_soong.mk' \
+              "$boardconfig"
+
+      - name: Install klee device tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$ORANGEFOX_TOP/device/xiaomi/klee"
+          rsync -a --delete \
+            --exclude .git \
+            --exclude images \
+            "$GITHUB_WORKSPACE/device-tree/" \
+            "$ORANGEFOX_TOP/device/xiaomi/klee/"
+
+      - name: Apply source patches & verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$ORANGEFOX_TOP/device/xiaomi/klee/tools/apply-orangefox-patches.sh" \
+            "$ORANGEFOX_TOP"
+
+      - name: Drop sync metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$ORANGEFOX_TOP/.repo" \
+            "$GITHUB_WORKSPACE/ofox-sync" \
+            "$GITHUB_WORKSPACE/pinned-manifest" \
+            "$GITHUB_WORKSPACE/ci-gitconfig"
+          df -h "$GITHUB_WORKSPACE"
+          free -h
+
+      - name: Check compilation capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # slimhub reclaims about 138 GiB on the standard hosted image. A
+          # full pinned source checkout leaves about 45 GiB after .repo is
+          # removed; this low-memory, single-job build requires a 35 GiB floor
+          # before Soong starts writing out/.
+          available_kib="$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')"
+          required_kib=$((35 * 1024 * 1024))
+          if [[ -z "${available_kib}" || "${available_kib}" -lt "${required_kib}" ]]; then
+            available_gib=$((available_kib / 1024 / 1024))
+            echo "::error::OrangeFox klee needs at least 35 GiB free after .repo cleanup; found ${available_gib} GiB."
+            exit 1
+          fi
+
+          du -sh "$ORANGEFOX_TOP"
+          df -h "$GITHUB_WORKSPACE"
+
+      - name: Build vendor_boot image
+        shell: bash
+        working-directory: ${{ env.ORANGEFOX_TOP }}
+        env:
+          ALLOW_MISSING_DEPENDENCIES: 'true'
+          FOX_BUILD_DEVICE: klee
+          FOX_AB_DEVICE: '1'
+          FOX_VIRTUAL_AB_DEVICE: '1'
+          OF_FORCE_PREBUILT_KERNEL: '1'
+          OF_LOW_MEMORY_BUILD: '1'
+          GOMEMLIMIT: '3GiB'
+          GOGC: '20'
+          _JAVA_OPTIONS: '-Xmx3g'
+          USE_CCACHE: '0'
+        run: |
+          set -euo pipefail
+          build_jobs="$(nproc)"
+          export OF_BUILD_JOBS="$build_jobs"
+          export NINJA_ARGS="-j${build_jobs} -l${build_jobs}"
+          export SOONG_UI_NINJA_ARGS="$NINJA_ARGS"
+          printf 'Using %s Ninja jobs\n' "$build_jobs"
+
+          device/xiaomi/klee/build-lowmem.sh vendorbootimage 2>&1 | \
+            tee "$GITHUB_WORKSPACE/orangefox-build.log"
+
+      - name: Collect release artifact
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ steps.metadata.outputs.image_name }}
+        run: |
+          set -euo pipefail
+          product="$ORANGEFOX_TOP/out/target/product/klee"
+          image="$product/$IMAGE_NAME"
+
+          rm -rf "$GITHUB_WORKSPACE/artifacts"
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          cp -fp "$image" "$GITHUB_WORKSPACE/artifacts/$IMAGE_NAME"
+          (
+            cd "$GITHUB_WORKSPACE/artifacts"
+            sha256sum "$IMAGE_NAME" > "${IMAGE_NAME}.sha256"
+          )
+
+          cat > "$GITHUB_WORKSPACE/artifacts/build-info.md" <<EOF
+          Automated OrangeFox build for klee.
+
+          - Device-tree commit: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}
+          - OrangeFox branch: ${ORANGEFOX_BRANCH}
+          - GitHub run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
+          This artifact contains the validated, system-compatible vendor_boot image.
+          EOF
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: artifacts
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orangefox-klee-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            orangefox-build.log
+            OrangeFox/out/logs
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Clean build worktree
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$ORANGEFOX_TOP" \
+            "$GITHUB_WORKSPACE/ofox-sync" \
+            "$GITHUB_WORKSPACE/pinned-manifest" \
+            "$GITHUB_WORKSPACE/artifacts"
+          rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
+            "$GITHUB_WORKSPACE/orangefox-build.log"
+
+  release:
+    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: orangefox-klee-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Verify images
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release-artifacts
+          image="OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
+          test -f "${image}"
+          test -f "${image}.sha256"
+          sha256sum --check --strict "${image}.sha256"
+
+      - name: Create prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          release_tag="klee-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA::7}"
+          notes="$GITHUB_WORKSPACE/release-notes.md"
+          cat > "$notes" <<EOF
+          Automated OrangeFox build for klee.
+
+          - Device-tree commit: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}
+          - OrangeFox branch: ${ORANGEFOX_BRANCH}
+          - GitHub run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+
+          This prerelease contains a validated system-compatible vendor_boot image.
+          EOF
+
+          gh release create "$release_tag" \
+            "release-artifacts/OrangeFox-R12.0-Unofficial-klee-system-compatible.img" \
+            "release-artifacts/OrangeFox-R12.0-Unofficial-klee-system-compatible.img.sha256" \
+            --repo "$GH_REPO" \
+            --target "$GITHUB_SHA" \
+            --title "OrangeFox klee CI ${GITHUB_SHA::7}" \
+            --notes-file "$notes" \
+            --prerelease
