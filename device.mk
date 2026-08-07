@@ -1,24 +1,18 @@
 DEVICE_PATH := device/xiaomi/klee
 
-# Inherit from those products. Most specific first.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 
-# Enable project quotas and casefolding for emulated storage without sdcardfs
 $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
-# Enable Virtual A/B OTA
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression.mk)
 
-# API
 PRODUCT_SHIPPING_API_LEVEL := 34
 PRODUCT_TARGET_VNDK_VERSION := 36
 
-# Enable Fuse Passthrough
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 
-# TWRP in Vendor Boot
 PRODUCT_PROPERTY_OVERRIDES += ro.twrp.vendor_boot=true
 
 PRODUCT_PACKAGES += \
@@ -39,13 +33,11 @@ AB_OTA_POSTINSTALL_CONFIG += \
     FILESYSTEM_TYPE_vendor=erofs \
     POSTINSTALL_OPTIONAL_vendor=true
 
-# Dynamic
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_USE_VIRTUAL_AB := true
 PRODUCT_VIRTUAL_AB_OTA := true
 PRODUCT_VIRTUAL_AB_COMPRESSION := true
 
-# Boot control HAL
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.0-impl-1.2-mtkimpl \
     android.hardware.boot@1.2-mtkimpl \
@@ -56,14 +48,12 @@ PRODUCT_PACKAGES_DEBUG += \
     bootctl \
     logcat
 
-# Health HAL
 PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl \
     android.hardware.health@2.1-service \
     android.hardware.health@2.1-impl.recovery \
     android.hardware.health@2.1-service.rc
 
-# Idk
 PRODUCT_PACKAGES += \
     create_pl_dev \
     create_pl_dev.recovery \
@@ -78,7 +68,6 @@ PRODUCT_PACKAGES += \
     snapuserd_ramdisk \
     libklee_libcxx_compat
 
-# Proprietary
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/init.recovery.bootctl.rc:recovery/root/init.recovery.bootctl.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.hardware.rc:recovery/root/init.recovery.hardware.rc \

@@ -7,7 +7,6 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import List, Optional
 
-
 def git_head(path: Path) -> Optional[str]:
     result = subprocess.run(
         ["git", "-C", str(path), "rev-parse", "HEAD"],
@@ -17,7 +16,6 @@ def git_head(path: Path) -> Optional[str]:
         text=True,
     )
     return result.stdout.strip() if result.returncode == 0 else None
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -55,7 +53,6 @@ def main() -> int:
 
     print(f"Pinned source verification passed: {len(projects)} projects")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

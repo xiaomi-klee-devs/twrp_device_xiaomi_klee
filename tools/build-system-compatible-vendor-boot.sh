@@ -90,11 +90,6 @@ if [ "$module_count" -gt 7 ]; then
     exit 1
 fi
 
-# The stock platform fragment also contains a complete stock-recovery
-# userspace. Normal Android boot never uses these files after /system is
-# mounted, and the OrangeFox recovery fragment supplies its own copies. Drop
-# only that recovery-only payload while retaining stock first-stage init,
-# linker/runtime, SELinux policy, fstab, firmware, and every kernel module.
 mkdir -p "$platform_root"
 (
     cd "$platform_root"
@@ -189,11 +184,6 @@ fingerprint="$(cat "${PRODUCT_OUT}/build_fingerprint.txt")"
 mkdir -p "$(dirname "$OUTPUT_IMAGE")"
 mv -f "$unsigned_image" "$OUTPUT_IMAGE"
 
-# OrangeFox creates these names before this post-build step. Replace both
-# whole-image outputs so an ordinary vendorbootimage build cannot leave a
-# recovery-only image that breaks Android boot. The installer ZIP still embeds
-# the earlier recovery-only whole image, so withhold it until the installer is
-# rebuilt after this system-compatible post-processing step.
 cp -fp "$OUTPUT_IMAGE" "${PRODUCT_OUT}/vendor_boot.img"
 cp -fp "$OUTPUT_IMAGE" "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.img"
 md5sum "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.img" \

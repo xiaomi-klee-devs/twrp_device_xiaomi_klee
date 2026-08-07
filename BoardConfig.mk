@@ -1,22 +1,5 @@
-#
-# Copyright (C) 2025 The TWRP Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 DEVICE_PATH := device/xiaomi/klee
 
-# Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
@@ -31,21 +14,16 @@ TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := generic
 TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a55
 
-# Assertation
 TARGET_OTA_ASSERT_DEVICE := klee
 
-# Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := mt6899
 TARGET_NO_BOOTLOADER := true
 
-# For building with minimal manifest
 ALLOW_MISSING_DEPENDENCIES := true
 
-# Rules
 BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 
-# Vendor Boot
 TARGET_KERNEL_ARCH := arm64
 BOARD_RAMDISK_USE_LZ4 := true
 TARGET_KERNEL_HEADER_ARCH := arm64
@@ -79,7 +57,6 @@ BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 
-# Partitions
 BOARD_FLASH_BLOCK_SIZE := 262144
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 
@@ -119,30 +96,22 @@ TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 TARGET_USERIMAGES_USE_EROFS := true
 
-# Hardware
 BOARD_USES_MTK_HARDWARE := true
 
-# Platform
 TARGET_BOARD_PLATFORM := mt6899
 
-# Device Fstab
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
 
-# Recovery
 TARGET_NO_RECOVERY := true
 BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_SUPPRESS_SECURE_ERASE := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 
-# Verified Boot
 BOARD_AVB_ENABLE := true
 
-# Prune the full ncurses database after OrangeFox finishes preparing the
-# ramdisk, while retaining common terminal definitions.
 BOARD_RECOVERY_IMAGE_PREPARE = bash $(DEVICE_PATH)/fox_callback.sh $(TARGET_RECOVERY_ROOT_OUT) --first-call
 
-# OTA
 AB_OTA_UPDATER := true
 OF_USE_AIDL_BOOT_CONTROL := 1
 OF_NO_REFLASH_CURRENT_ORANGEFOX := 1
@@ -164,7 +133,6 @@ AB_OTA_PARTITIONS += \
     odm_dlkm \
     mi_ext
 
-# TW Configuration
 TW_THEME := portrait_hdpi
 TARGET_SCREEN_WIDTH := 1268
 TARGET_SCREEN_HEIGHT := 2756
@@ -199,5 +167,4 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES = \
     $(TARGET_OUT_SHARED_LIBRARIES)/libtrusty.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libklee_libcxx_compat.so
 
-# Misc
 -include $(DEVICE_PATH)/fox_klee.mk

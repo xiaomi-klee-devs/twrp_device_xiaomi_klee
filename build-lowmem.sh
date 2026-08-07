@@ -62,9 +62,6 @@ source build/envsetup.sh
 lunch twrp_klee-ap2a-eng
 
 if printf ' %s ' "${TARGETS[*]}" | grep -q ' vendorbootimage '; then
-    # fox_callback.sh intentionally mutates the assembled recovery root (UPX,
-    # pruning, and /sbin symlinks). Reusing that generated tree makes the next
-    # OrangeFox pass try to overwrite dangling links and recompress UPX files.
     rm -rf "${OUT_DIR}/target/product/klee/recovery"
     rm -f "${OUT_DIR}/target/product/klee/obj/PACKAGING/recovery_intermediates/ramdisk_files-timestamp"
 fi

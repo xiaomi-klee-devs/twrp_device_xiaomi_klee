@@ -9,7 +9,6 @@ import subprocess
 import sys
 import tempfile
 
-
 MTK_DTB_MAGIC = b"\xd7\xb7\xab\x1e"
 FDT_MAGIC = b"\xd0\x0d\xfe\xed"
 XHCI_NODE = "/soc/usb0@11201000/xhci0@11200000"
@@ -18,10 +17,8 @@ WRAPPER_SIZE_OFFSET = 4
 INNER_DTB_SIZE_OFFSET = 32
 INNER_DTB_OFFSET_OFFSET = 36
 
-
 def read_be32(data: bytes, offset: int) -> int:
     return struct.unpack_from(">I", data, offset)[0]
-
 
 def patch_dtb(input_path: pathlib.Path, output_path: pathlib.Path) -> None:
     fdtget = shutil.which("fdtget")
@@ -88,7 +85,6 @@ def patch_dtb(input_path: pathlib.Path, output_path: pathlib.Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_bytes(wrapper + patched_inner + trailing_data)
 
-
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", required=True, type=pathlib.Path)
@@ -101,7 +97,6 @@ def main() -> int:
         print(f"DTB patch failed: {error}", file=sys.stderr)
         return 1
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

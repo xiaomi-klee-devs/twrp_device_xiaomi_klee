@@ -13,7 +13,6 @@ export FOX_USE_LZ4_BINARY=1
 export OF_FORCE_PREBUILT_KERNEL=1
 export OF_USE_LZ4_COMPRESSION=1
 
-# Keep local OrangeFox builds usable on very low-memory machines.
 export OF_LOW_MEMORY_BUILD="${OF_LOW_MEMORY_BUILD:-1}"
 if [ "${OF_LOW_MEMORY_BUILD}" = "1" ]; then
     export OF_BUILD_JOBS="${OF_BUILD_JOBS:-1}"
