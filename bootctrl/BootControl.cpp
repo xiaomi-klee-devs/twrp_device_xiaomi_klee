@@ -87,7 +87,11 @@ Return<void> BootControl::markBootSuccessful(markBootSuccessful_cb _hidl_cb) {
 
 Return<void> BootControl::setActiveBootSlot(uint32_t slot, setActiveBootSlot_cb _hidl_cb) {
     struct CommandResult cr;
-    if (impl_.SetActiveBootSlot(slot) && implext_.SetBootRegionSlot(slot)) {
+    bool region_ok = implext_.SetBootRegionSlot(slot);
+    if (!region_ok) {
+        LOG(WARNING) << "SetBootRegionSlot failed (non-fatal on this chipset), continuing";
+    }
+    if (impl_.SetActiveBootSlot(slot)) {
         cr.success = true;
         cr.errMsg = "Success";
     } else {
