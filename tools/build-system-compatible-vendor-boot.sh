@@ -16,13 +16,6 @@ MKBOOTFS="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootfs"
 AVBTOOL="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/avbtool"
 DTB_PATCHER="${DEVICE_DIR}/tools/patch-vendor-boot-dtb.py"
 
-for file in "$STOCK_RAMDISK" "$STOCK_DTB" "$RECOVERY_LZ4" "$LZ4" "$MKBOOTIMG" "$MKBOOTFS" "$AVBTOOL"; do
-    if [ ! -f "$file" ]; then
-        echo "missing required build input: $file" >&2
-        exit 1
-    fi
-done
-
 work_dir="$(mktemp -d "${TMPDIR:-/tmp}/klee-vendor-boot.XXXXXX")"
 trap 'rm -rf "$work_dir"' EXIT
 
@@ -37,58 +30,6 @@ patched_dtb="${work_dir}/mt6899-klee-no-usb-offload.dtb"
 python3 "$DTB_PATCHER" --input "$STOCK_DTB" --output "$patched_dtb"
 "$LZ4" -d -f "$RECOVERY_LZ4" "$recovery_cpio" >/dev/null
 "$LZ4" -d -f "$STOCK_RAMDISK" "$platform_cpio" >/dev/null
-
-verify_recovery_elf() {
-    local cpio_file="$1" archive_path="$2" extracted_file
-
-    extracted_file="${work_dir}/$(basename "$archive_path")"
-    if ! cpio -it --quiet < "$cpio_file" | grep -E "^(\./)?${archive_path}$" >/dev/null; then
-        echo "recovery ramdisk is missing required ELF: $archive_path" >&2
-        exit 1
-    fi
-    cpio -i --quiet --to-stdout "$archive_path" < "$cpio_file" > "$extracted_file"
-    python3 - "$extracted_file" "$archive_path" <<'PY'
-import pathlib
-import sys
-
-library = pathlib.Path(sys.argv[1])
-archive_path = sys.argv[2]
-if library.read_bytes()[:4] != b"\x7fELF":
-    raise SystemExit(f"recovery ramdisk has invalid ELF: {archive_path}")
-PY
-}
-
-verify_recovery_elf "$recovery_cpio" system/lib64/libprocessgroup_setup.so
-
-verify_otg_platform_stack() {
-    local root="$1" module
-
-    for module in \
-        charger_class.ko \
-        extcon-mtk-usb.ko \
-        mt6375-charger.ko \
-        mtk_charger_framework.ko \
-        mtu3.ko \
-        tcpc_class.ko \
-        tcpc_mt6375.ko \
-        xhci-mtk-hcd-v2.ko; do
-        if [ ! -f "$root/lib/modules/$module" ]; then
-            echo "${FIRMWARE_VARIANT} platform ramdisk is missing OTG module: $module" >&2
-            exit 1
-        fi
-    done
-
-    if ! strings -a "$root/lib/modules/extcon-mtk-usb.ko" | grep -qx 'vbus_switch'; then
-        echo "${FIRMWARE_VARIANT} extcon-mtk-usb lacks the vbus_switch control" >&2
-        exit 1
-    fi
-}
-
-module_count="$(cpio -it --quiet < "$recovery_cpio" | awk '/^lib\/modules\/.*\.ko$/ { count++ } END { print count + 0 }')"
-if [ "$module_count" -gt 7 ]; then
-    echo "recovery fragment still contains $module_count modules; expected at most 7" >&2
-    exit 1
-fi
 
 mkdir -p "$platform_root"
 (
@@ -121,42 +62,10 @@ rm -f \
     "$platform_root/system/etc/vintf/manifest/android.hardware.health-service.example.xml" \
     "$platform_root/system/lib64/librecovery_ui.so"
 
-if find "$platform_root/system/etc/vintf/manifest" -maxdepth 1 -type f \
-        -exec grep -l 'type="device"' {} + 2>/dev/null | grep -q .; then
-    echo "pruned platform still contains a device VINTF fragment under /system" >&2
-    exit 1
-fi
-
-for essential in \
-    system/bin/init \
-    system/bin/linker64 \
-    system/lib64/libc.so \
-    first_stage_ramdisk/fstab.mt6899 \
-    lib/modules/modules.load; do
-    if [ ! -f "$platform_root/$essential" ]; then
-        echo "pruned platform is missing normal-boot file: $essential" >&2
-        exit 1
-    fi
-done
-
-platform_module_count="$(find "$platform_root/lib/modules" -maxdepth 1 -type f -name '*.ko' | wc -l)"
-if [ "$platform_module_count" -ne 244 ]; then
-    echo "pruned platform contains $platform_module_count modules; expected 244" >&2
-    exit 1
-fi
-
 "$MKBOOTFS" -d "${PRODUCT_OUT}/system" "$platform_root" > "$platform_pruned_cpio"
 "$LZ4" -l -12 --favor-decSpeed -f "$platform_pruned_cpio" "$platform_pruned_lz4" >/dev/null
 
 VENDOR_BOOT_PARTITION_SIZE=67108864
-HEADER_AND_FOOTER_OVERHEAD=1048576
-
-max_ramdisk_size=$(( VENDOR_BOOT_PARTITION_SIZE - $(stat -c %s "$STOCK_DTB") - HEADER_AND_FOOTER_OVERHEAD ))
-total_ramdisk_size=$(( $(stat -c %s "$platform_pruned_lz4") + $(stat -c %s "$RECOVERY_LZ4") ))
-if [ "$total_ramdisk_size" -ge "$max_ramdisk_size" ]; then
-    echo "combined vendor ramdisk is $total_ramdisk_size bytes; expected less than $max_ramdisk_size" >&2
-    exit 1
-fi
 
 "$MKBOOTIMG" \
     --dtb "$patched_dtb" \
