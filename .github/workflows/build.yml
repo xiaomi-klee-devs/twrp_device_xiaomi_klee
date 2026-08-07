@@ -153,9 +153,11 @@ jobs:
           set -euo pipefail
 
           image_name="OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
+          disable_avb_image_name="OrangeFox-R12.0-Unofficial-klee-disable-avb-system-compatible.img"
 
           echo "artifact_name=orangefox-klee-release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
           echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
+          echo "disable_avb_image_name=${disable_avb_image_name}" >> "$GITHUB_OUTPUT"
 
       - name: Remove stale build worktree
         if: ${{ inputs.run_remove_worktree != false }}
@@ -387,17 +389,21 @@ jobs:
         shell: bash
         env:
           IMAGE_NAME: ${{ steps.metadata.outputs.image_name }}
+          DISABLE_AVB_IMAGE_NAME: ${{ steps.metadata.outputs.disable_avb_image_name }}
         run: |
           set -euo pipefail
           product="$ORANGEFOX_TOP/out/target/product/klee"
           image="$product/$IMAGE_NAME"
+          disable_avb_image="$product/$DISABLE_AVB_IMAGE_NAME"
 
           rm -rf "$GITHUB_WORKSPACE/artifacts"
           mkdir -p "$GITHUB_WORKSPACE/artifacts"
           cp -fp "$image" "$GITHUB_WORKSPACE/artifacts/$IMAGE_NAME"
+          cp -fp "$disable_avb_image" "$GITHUB_WORKSPACE/artifacts/$DISABLE_AVB_IMAGE_NAME"
           (
             cd "$GITHUB_WORKSPACE/artifacts"
             sha256sum "$IMAGE_NAME" > "${IMAGE_NAME}.sha256"
+            sha256sum "$DISABLE_AVB_IMAGE_NAME" > "${DISABLE_AVB_IMAGE_NAME}.sha256"
           )
 
           cat > "$GITHUB_WORKSPACE/artifacts/build-info.md" <<EOF
@@ -407,7 +413,7 @@ jobs:
           - OrangeFox branch: ${ORANGEFOX_BRANCH}
           - GitHub run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
 
-          This artifact contains the validated, system-compatible vendor_boot image.
+          This artifact contains the validated standard and disable-avb system-compatible vendor_boot images.
           EOF
 
       - name: Upload release artifact
@@ -463,10 +469,14 @@ jobs:
         run: |
           set -euo pipefail
           cd release-artifacts
-          image="OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
-          test -f "${image}"
-          test -f "${image}.sha256"
-          sha256sum --check --strict "${image}.sha256"
+          for image in \
+            OrangeFox-R12.0-Unofficial-klee-system-compatible.img \
+            OrangeFox-R12.0-Unofficial-klee-disable-avb-system-compatible.img
+          do
+            test -f "${image}"
+            test -f "${image}.sha256"
+            sha256sum --check --strict "${image}.sha256"
+          done
 
       - name: Create prerelease
         shell: bash
@@ -484,12 +494,14 @@ jobs:
           - OrangeFox branch: ${ORANGEFOX_BRANCH}
           - GitHub run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
 
-          This prerelease contains a validated system-compatible vendor_boot image.
+          This prerelease contains standard and disable-avb system-compatible vendor_boot images.
           EOF
 
           gh release create "$release_tag" \
             "release-artifacts/OrangeFox-R12.0-Unofficial-klee-system-compatible.img" \
             "release-artifacts/OrangeFox-R12.0-Unofficial-klee-system-compatible.img.sha256" \
+            "release-artifacts/OrangeFox-R12.0-Unofficial-klee-disable-avb-system-compatible.img" \
+            "release-artifacts/OrangeFox-R12.0-Unofficial-klee-disable-avb-system-compatible.img.sha256" \
             --repo "$GH_REPO" \
             --target "$GITHUB_SHA" \
             --title "OrangeFox klee CI ${GITHUB_SHA::7}" \
