@@ -15,6 +15,45 @@ PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 
 PRODUCT_PROPERTY_OVERRIDES += ro.twrp.vendor_boot=true
 
+# A/B
+AB_OTA_UPDATER := true
+ENABLE_VIRTUAL_AB := true
+TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
+AB_OTA_PARTITIONS += \
+    apusys \
+    audio_dsp \
+    boot \
+    ccu \
+    dpm \
+    dtbo \
+    gpueb \
+    gz \
+    lk \
+    logo \
+    mcf_ota \
+    mcupm \
+    md1img \
+    mvpu_algo \
+    odm \
+    odm_dlkm \
+    pi_img \
+    preloader_raw \
+    product \
+    scp \
+    spmfw \
+    sspm \
+    system \
+    system_ext \
+    tee \
+    vbmeta \
+    vbmeta_system \
+    vbmeta_vendor \
+    vcp \
+    vendor \
+    vendor_boot \
+    vendor_dlkm \
+    mi_ext
+
 PRODUCT_PACKAGES += \
     update_engine \
     update_engine_sideload \
