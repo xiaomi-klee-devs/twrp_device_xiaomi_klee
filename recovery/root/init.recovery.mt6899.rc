@@ -2,12 +2,15 @@ import /init.recovery.bootctl.rc
 import /init.recovery.keymint.rc
 
 on early-init
-    write /sys/fs/selinux/enforce 0
+    write /sys/fs/selinux/enforce 1
 
 on init
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.configfs 1
     setprop sys.usb.controller "11201000.usb0"
+
+on property:servicemanager.ready=true
+    start vendor.boot-default
 
 service load-touch-module /sbin/sh /system/bin/load-touch-modules.sh
     user root
