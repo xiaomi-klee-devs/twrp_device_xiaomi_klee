@@ -9,7 +9,7 @@ on init
     setprop sys.usb.configfs 1
     setprop sys.usb.controller "11201000.usb0"
 
-service load-touch-module /sbin/sh /system/bin/load-touch-module.sh
+service load-touch-module /sbin/sh /system/bin/load-touch-modules.sh
     user root
     group root
     oneshot
