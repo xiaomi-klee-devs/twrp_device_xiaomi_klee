@@ -1,7 +1,7 @@
 service vendor.boot-default /vendor/bin/hw/android.hardware.boot-service.mtk
     class early_hal
     user root
-    group root
+    group root system
     setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw
     setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
     seclabel u:r:hal_bootctl_default:s0

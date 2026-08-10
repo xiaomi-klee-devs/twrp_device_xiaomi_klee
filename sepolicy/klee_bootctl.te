@@ -1,0 +1,4 @@
+type klee_ufs_bootctl_device, dev_type;
+
+allow hal_bootctl_default self:capability sys_rawio;
+allow hal_bootctl_default klee_ufs_bootctl_device:chr_file rw_file_perms;
