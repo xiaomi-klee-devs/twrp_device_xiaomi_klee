@@ -149,4 +149,5 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.secureclock-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.secureclock-service.mitee.xml \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml \
-    $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.boot-service.mtk:recovery/root/vendor/bin/hw/android.hardware.boot-service.mtk
+    $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.boot-service.mtk:recovery/root/vendor/bin/hw/android.hardware.boot-service.mtk \
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.boot-service.mtk.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.boot-service.mtk.xml
