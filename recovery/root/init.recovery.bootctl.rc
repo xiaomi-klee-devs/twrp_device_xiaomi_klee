@@ -6,3 +6,11 @@ service vendor.boot-default /vendor/bin/hw/android.hardware.boot-service.mtk
     setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
     seclabel u:r:hal_bootctl_default:s0
     interface aidl android.hardware.boot.IBootControl/default
+
+service boot-hal-1-2 /system/bin/android.hardware.boot@1.2-service
+    user root
+    group root
+    override
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0

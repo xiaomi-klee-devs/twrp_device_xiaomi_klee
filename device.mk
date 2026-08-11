@@ -80,6 +80,9 @@ PRODUCT_VIRTUAL_AB_COMPRESSION := true
 PRODUCT_PACKAGES_DEBUG += \
     logcat
 
+PRODUCT_PACKAGES -= \
+    android.hardware.boot@1.2-service
+
 PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl \
     android.hardware.health@2.1-service \
