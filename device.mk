@@ -77,14 +77,7 @@ PRODUCT_USE_VIRTUAL_AB := true
 PRODUCT_VIRTUAL_AB_OTA := true
 PRODUCT_VIRTUAL_AB_COMPRESSION := true
 
-PRODUCT_PACKAGES += \
-    android.hardware.boot@1.0-impl-1.2-mtkimpl \
-    android.hardware.boot@1.2-mtkimpl \
-    android.hardware.boot@1.2-mtkimpl.recovery
-
 PRODUCT_PACKAGES_DEBUG += \
-    bootctrl \
-    bootctl \
     logcat
 
 PRODUCT_PACKAGES += \
