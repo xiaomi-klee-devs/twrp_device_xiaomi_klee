@@ -5,8 +5,12 @@ DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 TOP_DIR="${1:-$(cd -- "${DEVICE_DIR}/../../.." && pwd -P)}"
 RECOVERY_DIR="${TOP_DIR}/bootable/recovery"
 BUILD_DIR="${TOP_DIR}/build/make"
+SYSTEM_VOLD_DIR="${TOP_DIR}/system/vold"
+SYSTEM_CORE_DIR="${TOP_DIR}/system/core"
 RECOVERY_PATCH="${DEVICE_DIR}/patches/orangefox-recovery.patch"
 BUILD_PATCH="${DEVICE_DIR}/patches/orangefox-build-make.patch"
+SYSTEM_VOLD_PATCH="${DEVICE_DIR}/patches/orangefox-system-vold.patch"
+SYSTEM_CORE_PATCH="${DEVICE_DIR}/patches/orangefox-system-core.patch"
 
 apply_patch_once() {
     local repository="$1" patch_file="$2" label="$3"
@@ -31,6 +35,8 @@ apply_patch_once() {
 
 apply_patch_once "${BUILD_DIR}" "${BUILD_PATCH}" "OrangeFox build/make"
 apply_patch_once "${RECOVERY_DIR}" "${RECOVERY_PATCH}" "OrangeFox recovery"
+apply_patch_once "${SYSTEM_VOLD_DIR}" "${SYSTEM_VOLD_PATCH}" "OrangeFox system/vold"
+apply_patch_once "${SYSTEM_CORE_DIR}" "${SYSTEM_CORE_PATCH}" "OrangeFox system/core"
 
 for language in es_ES hu_HU zh_CN zh_TW; do
     source_file="${RECOVERY_DIR}/gui/theme/extra-languages/languages/${language}.xml"
