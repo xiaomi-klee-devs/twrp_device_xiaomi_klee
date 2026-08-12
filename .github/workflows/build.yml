@@ -88,6 +88,11 @@ on:
         required: false
         default: true
         type: boolean
+      run_avb_patch:
+        description: 'Step: Apply avb patch'
+        required: false
+        default: true
+        type: boolean
       run_drop_sync:
         description: 'Step: Drop sync metadata'
         required: false
@@ -343,6 +348,14 @@ jobs:
           cp "$ORANGEFOX_TOP"/device/xiaomi/klee/patches/orangefox_theme_custom.patch "$ORANGEFOX_TOP"/bootable/recovery
           cd "$ORANGEFOX_TOP"/bootable/recovery
           patch -p1 < orangefox_theme_custom.patch
+
+      - name: Apply avb patch
+        if: ${{ inputs.run_avb_patch != false }}
+        shell: bash
+        run: |
+          cp "$ORANGEFOX_TOP"/device/xiaomi/klee/patches/orangefox_avb_fallback.patch "$ORANGEFOX_TOP"/system/core
+          cd "$ORANGEFOX_TOP"/system/core
+          patch -p1 < orangefox_avb_fallback.patch
 
       - name: Drop sync metadata
         if: ${{ inputs.run_drop_sync != false }}
