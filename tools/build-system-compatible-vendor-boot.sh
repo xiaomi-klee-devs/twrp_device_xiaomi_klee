@@ -36,31 +36,6 @@ mkdir -p "$platform_root"
     cd "$platform_root"
     cpio -idm --quiet --no-absolute-filenames < "$platform_cpio"
 )
-rm -rf "$platform_root/res"
-rm -f \
-    "$platform_root/miui.factoryreset.rc" \
-    "$platform_root/system/bin/adbd" \
-    "$platform_root/system/bin/fastbootd" \
-    "$platform_root/system/bin/logcat" \
-    "$platform_root/system/bin/logd" \
-    "$platform_root/system/bin/recovery" \
-    "$platform_root/system/bin/servicemanager" \
-    "$platform_root/system/bin/sh" \
-    "$platform_root/system/bin/toolbox" \
-    "$platform_root/system/bin/toybox" \
-    "$platform_root/system/bin/update_engine_sideload" \
-    "$platform_root/system/bin/hw/android.hardware.boot-service.mtk_recovery" \
-    "$platform_root/system/bin/hw/android.hardware.health-service.example_recovery" \
-    "$platform_root/system/etc/init/android.hardware.boot-service.mtk_recovery.rc" \
-    "$platform_root/system/etc/init/android.hardware.health-service.example_recovery.rc" \
-    "$platform_root/system/etc/init/recovery-persist.rc" \
-    "$platform_root/system/etc/init/recovery-refresh.rc" \
-    "$platform_root/system/etc/init/servicemanager.recovery.rc" \
-    "$platform_root/system/etc/recovery.fstab" \
-    "$platform_root/system/etc/security/otacerts.zip" \
-    "$platform_root/system/etc/vintf/manifest/android.hardware.boot-service.mtk.xml" \
-    "$platform_root/system/etc/vintf/manifest/android.hardware.health-service.example.xml" \
-    "$platform_root/system/lib64/librecovery_ui.so"
 
 "$MKBOOTFS" -d "${PRODUCT_OUT}/system" "$platform_root" > "$platform_pruned_cpio"
 "$LZ4" -l -12 --favor-decSpeed -f "$platform_pruned_cpio" "$platform_pruned_lz4" >/dev/null
