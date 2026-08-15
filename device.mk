@@ -15,7 +15,6 @@ PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 
 PRODUCT_PROPERTY_OVERRIDES += ro.twrp.vendor_boot=true
 
-# A/B
 AB_OTA_UPDATER := true
 ENABLE_VIRTUAL_AB := true
 TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
@@ -146,4 +145,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.security.sharedsecret-service.mitee.xml \
     $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.weaver-service.nxp.xml \
     $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.boot-service.mtk:recovery/root/vendor/bin/hw/android.hardware.boot-service.mtk \
-    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.boot-service.mtk.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.boot-service.mtk.xml
+    $(DEVICE_PATH)/proprietary/vendor/etc/vintf/manifest/android.hardware.boot-service.mtk.xml:recovery/root/vendor/etc/vintf/manifest/android.hardware.boot-service.mtk.xml \
+    $(DEVICE_PATH)/proprietary/vendor/bin/hw/android.hardware.weaver:recovery/root/vendor/bin/hw/android.hardware.weaver \
+    $(DEVICE_PATH)/proprietary/vendor/lib64/vendor.xiaomi.hardware.cpace-V1-ndk.so:recovery/root/vendor/lib64/vendor.xiaomi.hardware.cpace-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/mitee/ta/8aaaf201-2460-0010-aabbccdd00000006.ta:recovery/root/vendor/mitee/ta/8aaaf201-2460-0010-aabbccdd00000006.ta

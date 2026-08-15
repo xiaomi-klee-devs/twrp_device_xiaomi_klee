@@ -42,15 +42,22 @@ service klee.omapi_bridge /system/bin/klee_omapi_bridge
     seclabel u:r:recovery:s0
     disabled
 
-service vendor.weaver_nxp /vendor/bin/hw/android.hardware.weaver-service.nxp
+service vendor.weaver_nxp /system/bin/klee_miweaver_wait.sh
     class hal
-    user 2902
+    user system
     group system drmrpc
-    capabilities WAKE_ALARM
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
+    setenv LD_PRELOAD /system/lib64/libc++_hos.so
     seclabel u:r:recovery:s0
     disabled
+
+service klee.fbe_prep /system/bin/klee_fbe_prep.sh
+    class hal
+    user root
+    group root system
+    seclabel u:r:recovery:s0
+    disabled
+    oneshot
 
 on fs
     mkdir /mnt/vendor/persist 0755 root root
@@ -81,7 +88,7 @@ on fs
 on property:init.svc.tee-supplicant=running
     start vendor.keymint-mitee
     start vendor.secure_element_hal_service
-    start vendor.weaver_nxp
+    start klee.fbe_prep
 
 on property:init.svc.vendor.secure_element_hal_service=running
     start klee.omapi_bridge
