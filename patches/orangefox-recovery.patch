@@ -1898,10 +1898,18 @@ index a0240333..6961575c 100755
  endif
 -
 diff --git a/twrp.cpp b/twrp.cpp
-index c9fdc572..f74435d2 100644
+index c9fdc572..f0673899 100644
 --- a/twrp.cpp
 +++ b/twrp.cpp
-@@ -250,6 +250,12 @@ static void process_recovery_mode(twrpAdbBuFifo* adb_bu_fifo, bool skip_decrypti
+@@ -51,6 +51,7 @@ extern "C" {
+ #include "data.hpp"
+ 
+ #include "partitions.hpp"
++#include "twrpRepacker.hpp"
+ #ifdef __ANDROID_API_N__
+ #include <android-base/strings.h>
+ #else
+@@ -250,6 +251,12 @@ static void process_recovery_mode(twrpAdbBuFifo* adb_bu_fifo, bool skip_decrypti
  
  #ifdef TW_INCLUDE_CRYPTO
  	android::keystore::copySqliteDb();
@@ -1914,7 +1922,7 @@ index c9fdc572..f74435d2 100644
  #endif
  	Decrypt_Page(skip_decryption, datamedia);
  
-@@ -403,10 +409,12 @@ static bool Fox_CheckReload_Themes() {
+@@ -403,10 +410,12 @@ static bool Fox_CheckReload_Themes() {
    || TWFunc::Fox_Property_Get("orangefox.mount_to_decrypt") == "1") {
  	DataManager::SetValue(FOX_ENCRYPTED_DEVICE, "1");
      }
@@ -1931,6 +1939,21 @@ index c9fdc572..f74435d2 100644
  #endif
  }
  
+@@ -630,6 +639,14 @@ int main(int argc, char **argv) {
+ 	} else {
+ 		process_recovery_mode(adb_bu_fifo, startup.Should_Skip_Decryption());
+ 	}
++
++	// Now that decryption (if any) is settled, cache the currently-running recovery/vendor_boot
++	// image to /tmp, right before the main menu comes up. This way "Flash Current OrangeFox"
++	// later on doesn't need to dd the partition again - it can just reuse this file.
++	if (!startup.Get_Fastboot_Mode()) {
++		twrpRepacker boot_cache_repacker;
++		boot_cache_repacker.Cache_Current_Image();
++	}
+ #ifndef FOX_ALLOW_EARLY_SETTINGS_LOAD
+ 	// Language
+ 	PageManager::LoadLanguage(DataManager::GetStrValue("tw_language"));
 diff --git a/twrpApex.cpp b/twrpApex.cpp
 index 557283b1..784c2b6c 100755
 --- a/twrpApex.cpp
@@ -1956,6 +1979,139 @@ index 557283b1..784c2b6c 100755
  		}
  		device_no++;
  	}
+diff --git a/twrpRepacker.cpp b/twrpRepacker.cpp
+index ca3f8243..2d1a223c 100755
+--- a/twrpRepacker.cpp
++++ b/twrpRepacker.cpp
+@@ -321,6 +321,43 @@ bool twrpRepacker::Repack_Image_And_Flash(const std::string& Target_Image, const
+ 	return true;
+ }
+ 
++// Extracts the recovery/vendor_boot image of the currently active slot into /tmp.
++// Meant to be called once, very early at boot (right after the fstab/partitions are
++// set up), so that a later "Flash Current OrangeFox" doesn't need to dd the partition
++// again - it can just reuse the file that's already sitting in /tmp.
++bool twrpRepacker::Cache_Current_Image() {
++#ifndef OF_RECOVERY_AB_FULL_REFLASH_RAMDISK
++	std::string slot = android::base::GetProperty("ro.boot.slot_suffix", "");
++	if (slot.empty())
++		slot = android::base::GetProperty("ro.boot.slot", "");
++
++	std::string dest_partition = "/recovery";
++	#if defined(FOX_VENDOR_BOOT_RECOVERY) || defined(BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT)
++		dest_partition = "/vendor_boot";
++	#endif
++
++	if (slot.empty() || !PartitionManager.Find_Partition_By_Path(dest_partition))
++		return false;
++
++	std::string root = "/dev/block/bootdevice/by-name" + dest_partition;
++	std::string src = (slot == "_a" || slot == "a") ? (root + "_a") : (root + "_b");
++
++	std::string tmp_filename = dest_partition.substr(1) + ".img"; // "vendor_boot.img" / "recovery.img"
++	std::string tmp_full = "/tmp/" + tmp_filename;
++
++	std::string command = "dd bs=1048576 if=" + src + " of=" + tmp_full;
++	LOGINFO("Command=%s\n", command.c_str());
++	if (TWFunc::Exec_Cmd(command) != 0) {
++		LOGERR("Failed to cache the current %s image to '%s'\n", dest_partition.c_str(), tmp_full.c_str());
++		return false;
++	}
++	LOGINFO("Cached the current %s image to '%s'\n", dest_partition.c_str(), tmp_full.c_str());
++	return true;
++#else
++	return false;
++#endif
++}
++
+ bool twrpRepacker::Flash_Current_Twrp() {
+ #ifndef OF_RECOVERY_AB_FULL_REFLASH_RAMDISK
+ 	// A/B with dedicated recovery partition
+@@ -334,33 +371,53 @@ bool twrpRepacker::Flash_Current_Twrp() {
+ 	#endif
+ 
+ 	if (!slot.empty() && PartitionManager.Find_Partition_By_Path(dest_partition)) {
+-		std::string root, src, dest;
++		std::string root, src;
+ 		root = "/dev/block/bootdevice/by-name" + dest_partition;
+-		if (slot == "_a" || slot == "a") {
++		if (slot == "_a" || slot == "a")
+ 			src = root + "_a";
+-			dest= root + "_b";
+-		}
+-		else {
++		else
+ 			src = root + "_b";
+-			dest= root + "_a";
+-		}
++
+ 		PartitionManager.Unlock_Block_Partitions();
+ 
+-		// only copy the relevant active slot to the inactive slot, on the basis that the recovery currently running
+-		// in the active slot can simply be copied over to the inactive slot, so that both have the same recovery image
+-		std::string command = "dd bs=1048576 if=" + src + " of=" + dest;
+-		LOGINFO("Command=%s\n", command.c_str());
++		std::string tmp_path = "/tmp";
++		std::string tmp_filename = dest_partition.substr(1) + ".img"; // e.g. "vendor_boot.img" / "recovery.img"
++		std::string tmp_full = tmp_path + "/" + tmp_filename;
+ 
+-		if (TWFunc::Exec_Cmd(command) != 0) {
+-			LOGERR("Failed to flash the %s image\n\n", dest_partition.c_str());
+-			return false;
++		if (TWFunc::Path_Exists(tmp_full)) {
++			// already cached at boot - no need to dd it again
++			LOGINFO("Reusing cached image already at '%s'\n", tmp_full.c_str());
++		} else {
++			// fallback: cache wasn't there for some reason, extract it now,
++			// same as a user manually picking an image file from /sdcard to flash
++			std::string command = "dd bs=1048576 if=" + src + " of=" + tmp_full;
++			LOGINFO("Command=%s\n", command.c_str());
++			if (TWFunc::Exec_Cmd(command) != 0) {
++				LOGERR("Failed to extract the current %s image to '%s'\n\n", dest_partition.c_str(), tmp_full.c_str());
++				return false;
++			}
+ 		}
+-		else {
+-			gui_print("Finished flashing the %s image\n\n", dest_partition.c_str());
+-			return true;
++
++		// now flash that image the same way the GUI does with "flash to both slots" checked:
++		// flash to the currently active slot, override to the other slot, flash again, then restore the slot
++		DataManager::SetValue("tw_flash_partition", dest_partition + ";");
++		std::string current_slot = PartitionManager.Get_Active_Slot_Display();
++
++		bool ok = PartitionManager.Flash_Image(tmp_path, tmp_filename);
++		if (ok) {
++			PartitionManager.Override_Active_Slot(current_slot == "A" ? "B" : "A");
++			ok = PartitionManager.Flash_Image(tmp_path, tmp_filename);
++			PartitionManager.Override_Active_Slot(current_slot);
+ 		}
+-		// if we reach here, something is awry - bale out
+-		return false;
++
++		// leave the cached image in /tmp (tmpfs) - it clears itself on reboot,
++		// and staying there lets a repeat "Flash Current OrangeFox" reuse it too
++		if (!ok) {
++			LOGERR("Failed to flash the %s image to both slots\n\n", dest_partition.c_str());
++			return false;
++		}
++		gui_print("Finished flashing the %s image to both slots\n\n", dest_partition.c_str());
++		return true;
+ 	}
+ #endif
+ 
+diff --git a/twrpRepacker.hpp b/twrpRepacker.hpp
+index e71f3dcb..8716347e 100755
+--- a/twrpRepacker.hpp
++++ b/twrpRepacker.hpp
+@@ -42,6 +42,7 @@ class twrpRepacker {
+         std::string Unpack_Image(const std::string& Source_Path, const std::string& Temp_Folder_Destination, const bool Copy_Source, const bool Create_Destination = true); // Prepares an image for repacking by unpacking it to the temp folder destination and return the ramdisk format
+         bool Repack_Image_And_Flash(const std::string& Target_Image, const struct Repack_Options_struct& Repack_Options); // Repacks the boot image with a new kernel or a new ramdisk
+         bool Flash_Current_Twrp();
++        bool Cache_Current_Image(); // dd's the currently-running recovery/vendor_boot image (active slot) to /tmp, called once early at boot
+     private:
+     	bool Prepare_Empty_Folder(const std::string& Folder); // Creates an empty folder at Folder. If the folder already exists, the folder is deleted, then created
+     	std::string original_ramdisk_format;                  // Ramdisk format of boot partition
 -- 
 2.55.0
 
