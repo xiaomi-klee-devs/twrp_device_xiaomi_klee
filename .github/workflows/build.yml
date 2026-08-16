@@ -21,37 +21,37 @@ on:
       run_remove_worktree:
         description: 'Step: Remove stale build worktree'
         required: false
-        default: true
+        default: false
         type: boolean
       run_free_disk:
         description: 'Step: Free disk space'
         required: false
-        default: true
+        default: false
         type: boolean
       run_set_swap:
         description: 'Step: Set swap space'
         required: false
-        default: true
+        default: false
         type: boolean
       run_packages:
         description: 'Step: Install host packages'
         required: false
-        default: true
+        default: false
         type: boolean
       run_setup_swap:
         description: 'Step: Setup build swap'
         required: false
-        default: true
+        default: false
         type: boolean
       run_capacity:
         description: 'Step: Check runner capacity'
         required: false
-        default: true
+        default: false
         type: boolean
       run_repo_tool:
         description: 'Step: Install repo tool'
         required: false
-        default: true
+        default: false
         type: boolean
       run_sync:
         description: 'Step: Sync OrangeFox sources'
@@ -76,7 +76,7 @@ on:
       run_drop_sync:
         description: 'Step: Drop sync metadata'
         required: false
-        default: true
+        default: false
         type: boolean
       run_build_vendorboot:
         description: 'Step: Build vendor_boot image'
@@ -101,7 +101,7 @@ on:
       run_clean:
         description: 'Step: Clean build worktree'
         required: false
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -119,7 +119,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: self-hosted
     timeout-minutes: 360
 
     steps:
