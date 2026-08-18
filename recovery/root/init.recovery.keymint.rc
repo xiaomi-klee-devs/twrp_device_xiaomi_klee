@@ -51,6 +51,15 @@ service vendor.weaver_nxp /system/bin/klee_miweaver_wait.sh
     seclabel u:r:recovery:s0
     disabled
 
+service vendor.weaver_nxp_fb /vendor/bin/hw/android.hardware.weaver-service.nxp
+    class hal
+    user system
+    group system drmrpc
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
+    setenv LD_PRELOAD /system/lib64/libc++_hos.so
+    seclabel u:r:recovery:s0
+    disabled
+
 service klee.fbe_prep /system/bin/klee_fbe_prep.sh
     class hal
     user root

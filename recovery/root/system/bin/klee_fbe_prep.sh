@@ -50,14 +50,22 @@ if [ "$WV" != "running" ]; then
     setprop ctl.start vendor.weaver_nxp
 fi
 
+WVFB="$(getprop init.svc.vendor.weaver_nxp_fb)"
+if [ "$WVFB" != "running" ]; then
+    setprop ctl.start vendor.weaver_nxp_fb
+fi
+
 i=0
 while [ "$i" -lt 10 ]; do
     WV="$(getprop init.svc.vendor.weaver_nxp)"
-    [ "$WV" = "running" ] && break
+    WVFB="$(getprop init.svc.vendor.weaver_nxp_fb)"
+    [ "$WV" = "running" ] && [ "$WVFB" = "running" ] && break
     /system/bin/sleep 1
     i=$((i + 1))
 done
 logk "weaver state=$WV pid=$(getprop init.svc_debug_pid.vendor.weaver_nxp)"
+logk "weaver_fb state=$WVFB pid=$(getprop init.svc_debug_pid.vendor.weaver_nxp_fb)"
 
 [ "$WV" = "running" ] || exit 25
+[ "$WVFB" = "running" ] || exit 26
 exit 0
