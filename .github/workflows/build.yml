@@ -270,16 +270,6 @@ jobs:
           git -C "$sync_dir" checkout --detach "$ORANGEFOX_SYNC_REVISION"
           test "$(git -C "$sync_dir" rev-parse HEAD)" = "$ORANGEFOX_SYNC_REVISION"
 
-          vold_patch="$sync_dir/patches/patch-vold-fox_14.1.diff"
-          test "$(sha256sum "$vold_patch" | awk '{print $1}')" = \
-            "29b4b0b387c3185a3dcc69f141a3c84969510547d13ed2de71eefa8423c57778"
-          if git -C "$ORANGEFOX_TOP/system/vold" apply --reverse --check "$vold_patch" 2>/dev/null; then
-            echo "OrangeFox system/vold patch is already applied"
-          else
-            git -C "$ORANGEFOX_TOP/system/vold" apply --check "$vold_patch"
-            git -C "$ORANGEFOX_TOP/system/vold" apply "$vold_patch"
-          fi
-
           boardconfig="$ORANGEFOX_TOP/vendor/twrp/config/BoardConfigSoong.mk"
           grep -qx 'include bootable/recovery/orangefox_soong.mk' "$boardconfig" || \
             sed -i '/SOONG_CONFIG_NAMESPACES += twrpVarsPlugin/i include bootable/recovery/orangefox_soong.mk' \
