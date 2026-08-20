@@ -53,8 +53,9 @@ service vendor.weaver_nxp /system/bin/klee_miweaver_wait.sh
 
 service vendor.weaver_nxp_fb /vendor/bin/hw/android.hardware.weaver-service.nxp
     class hal
-    user system
+    user 2902
     group system drmrpc
+    capabilities WAKE_ALARM
     setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
     setenv LD_PRELOAD /system/lib64/libc++_hos.so
     seclabel u:r:recovery:s0

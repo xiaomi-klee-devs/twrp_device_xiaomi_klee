@@ -133,6 +133,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.secure_element-V1-ndk.so:recovery/root/vendor/lib64/android.hardware.secure_element-V1-ndk.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.hardware.weaver-V2-ndk.so:recovery/root/vendor/lib64/android.hardware.weaver-V2-ndk.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/android.se.omapi-V1-ndk.so:recovery/root/vendor/lib64/android.se.omapi-V1-ndk.so \
+    $(DEVICE_PATH)/proprietary/vendor/etc/hal_uuid_map_klee.xml:recovery/root/vendor/etc/hal_uuid_map_klee.xml \
     $(DEVICE_PATH)/proprietary/vendor/lib64/ese_weaver.nxp.so:recovery/root/system/lib64/ese_weaver.nxp.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/libjc_keymint_transport.nxp.so:recovery/root/system/lib64/libjc_keymint_transport.nxp.so \
     $(DEVICE_PATH)/proprietary/vendor/lib64/libmemunreachable.so:recovery/root/system/lib64/libmemunreachable.so \
