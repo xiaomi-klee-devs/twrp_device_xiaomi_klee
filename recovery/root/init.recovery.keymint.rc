@@ -45,7 +45,7 @@ service klee.omapi_bridge /system/bin/klee_omapi_bridge
 service vendor.weaver_nxp /system/bin/klee_miweaver_wait.sh
     class hal
     user system
-    group system drmrpc
+    group system drmrpc secure_element nfc
     setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
     setenv LD_PRELOAD /system/lib64/libc++_hos.so
     seclabel u:r:recovery:s0
