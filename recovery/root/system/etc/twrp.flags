@@ -57,7 +57,6 @@
 /pi_img             emmc      /dev/block/by-name/pi_img                                             flags=display="pi_img"
 
 # Removable Storage
-/external_sd        auto  /dev/block/mmcblk1p1  /dev/block/mmcblk0p1     flags=display="MicroSD Card";storage;wipeingui;removable
 /usb_otg            auto  /dev/block/sda1 /dev/block/sda /dev/block/sdd1 flags=display="USB-OTG";storage;wipeingui;removable
 
 # Flashable logical partitions

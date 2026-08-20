@@ -14,6 +14,7 @@ LZ4="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/lz4"
 MKBOOTIMG="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootimg"
 MKBOOTFS="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootfs"
 AVBTOOL="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/avbtool"
+DTB_PATCHER="${DEVICE_DIR}/tools/patch-vendor-boot-dtb.py"
 
 work_dir="$(mktemp -d "${TMPDIR:-/tmp}/klee-vendor-boot.XXXXXX")"
 trap 'rm -rf "$work_dir"' EXIT
@@ -24,7 +25,9 @@ platform_root="${work_dir}/platform-root"
 platform_pruned_cpio="${work_dir}/platform-pruned.cpio"
 platform_pruned_lz4="${work_dir}/platform-pruned.cpio.lz4"
 unsigned_image="${work_dir}/vendor_boot.img"
+patched_dtb="${work_dir}/mt6899-klee-no-usb-offload.dtb"
 
+python3 "$DTB_PATCHER" --input "$STOCK_DTB" --output "$patched_dtb"
 "$LZ4" -d -f "$RECOVERY_LZ4" "$recovery_cpio" >/dev/null
 "$LZ4" -d -f "$STOCK_RAMDISK" "$platform_cpio" >/dev/null
 
@@ -65,7 +68,7 @@ rm -f \
 VENDOR_BOOT_PARTITION_SIZE=67108864
 
 "$MKBOOTIMG" \
-    --dtb "$STOCK_DTB" \
+    --dtb "$patched_dtb" \
     --base 0x3fff8000 \
     --pagesize 4096 \
     --vendor_cmdline "bootopt=64S3,32N2,64N2 erofs.reserved_pages=64" \
