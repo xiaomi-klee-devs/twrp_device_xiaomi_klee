@@ -6,7 +6,6 @@ modules=(
 )
 
 mount /vendor_dlkm
-# load modules
 for module in "${modules[@]}"; do
   insmod $mod_dir/$module
 done
