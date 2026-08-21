@@ -1,0 +1,2 @@
+/dev/block/sdc1 u:object_r:misc_block_device:s0
+/dev/ufs-bsg0 u:object_r:klee_ufs_bootctl_device:s0

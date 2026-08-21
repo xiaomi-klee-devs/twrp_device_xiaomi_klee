@@ -1,5 +1,7 @@
 DEVICE_PATH := device/xiaomi/klee
 
+BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy
+
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
@@ -113,7 +115,7 @@ BOARD_AVB_ENABLE := true
 BOARD_RECOVERY_IMAGE_PREPARE = bash $(DEVICE_PATH)/fox_callback.sh $(TARGET_RECOVERY_ROOT_OUT) --first-call
 
 AB_OTA_UPDATER := true
-
+OF_USE_AIDL_BOOT_CONTROL := 1
 AB_OTA_PARTITIONS += \
     boot \
     init_boot \
