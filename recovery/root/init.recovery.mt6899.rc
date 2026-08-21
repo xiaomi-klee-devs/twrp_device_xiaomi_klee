@@ -3,6 +3,7 @@ import /init.recovery.keymint.rc
 
 on early-init
     write /sys/fs/selinux/enforce 1
+    setprop vendor.haptics.ready 0
 
 on init
     setprop sys.usb.ffs.aio_compat 1
@@ -25,9 +26,17 @@ service create-bootdevice-link /sbin/sh /system/bin/create-bootdevice-link.sh
     oneshot
     disabled
     seclabel u:r:recovery:s0
-	
+
+service awinic-haptics-loader /system/bin/load-haptics-module.sh
+    disabled
+    oneshot
+    user root
+    group root input system
+    seclabel u:r:recovery:s0
+
 on boot
     start boot-hal-1-2
     start health-hal-2-1
     start load-touch-module
     start create-bootdevice-link
+    start awinic-haptics-loader
