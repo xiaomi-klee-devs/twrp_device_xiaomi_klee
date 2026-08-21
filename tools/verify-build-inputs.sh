@@ -20,6 +20,7 @@ fi
 for script in \
     "${DEVICE_DIR}/build-lowmem.sh" \
     "${DEVICE_DIR}/fox_callback.sh" \
+    "${DEVICE_DIR}/tools/apply-orangefox-patches.sh" \
     "${DEVICE_DIR}/tools/build-system-compatible-vendor-boot.sh" \
     "${DEVICE_DIR}/tools/collect-compat-report.sh" \
     "${DEVICE_DIR}/tools/verify-build-inputs.sh"; do
