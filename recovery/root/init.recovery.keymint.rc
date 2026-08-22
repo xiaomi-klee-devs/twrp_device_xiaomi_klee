@@ -42,7 +42,29 @@ service klee.omapi_bridge /system/bin/klee_omapi_bridge
     seclabel u:r:recovery:s0
     disabled
 
-service vendor.weaver_nxp /vendor/bin/hw/android.hardware.weaver
+service miweaver_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.authsecretd
+    class hal
+    user system
+    group system drmrpc
+    oneshot
+    disabled
+    interface aidl vendor.xiaomi.hardware.miauthsecretd.IMIAuthSecret/default
+    interface aidl vendor.xiaomi.hardware.miauthsecretd.ICpaceService/default
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
+    setenv LD_PRELOAD /system/lib64/libc++_hos.so
+    seclabel u:r:recovery:s0
+
+service vendor.weaver_nxp /vendor/bin/hw/android.hardware.weaver-service.nxp
+    class hal
+    user 2902
+    group system drmrpc
+    capabilities WAKE_ALARM
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
+    setenv LD_PRELOAD /system/lib64/libc++_hos.so
+    seclabel u:r:recovery:s0
+    disabled
+
+service vendor.weaver_xiaomi /vendor/bin/hw/android.hardware.weaver
     class hal
     user system
     group system drmrpc secure_element nfc
@@ -65,6 +87,13 @@ on fs
     mount ext4 /dev/block/by-name/persist /mnt/vendor/persist ro noatime nosuid nodev wait noload
     mkdir /persist 0755 root root
     mount none /mnt/vendor/persist /persist bind
+    mount none none /persist private
+    mount f2fs /dev/block/by-name/metadata /metadata rw noatime nosuid nodev discard
+    insmod /lib/modules/nxp_i2c.ko
+    insmod /lib/modules/p73.ko
+    insmod /lib/modules/tms_device_modules.ko
+    wait /dev/nq-nci 5
+    wait /dev/p73 5
     chmod 0660 /dev/tee0
     chmod 0660 /dev/teepriv0
     chmod 0660 /dev/rpmb0
