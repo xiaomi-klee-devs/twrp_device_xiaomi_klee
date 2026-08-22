@@ -1480,7 +1480,7 @@ index c437cc77..df685401 100644
 +}
  //* 
 diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index 0ea3a125..f37cd0ca 100755
+index 0ea3a125..3dd4554d 100755
 --- a/partitionmanager.cpp
 +++ b/partitionmanager.cpp
 @@ -25,7 +25,9 @@
@@ -1504,7 +1504,7 @@ index 0ea3a125..f37cd0ca 100755
  
  	Super_Partition_List.push_back(bare_partition_name);
  	LOGINFO("Trying to prepare %s from super partition\n", bare_partition_name.c_str());
-@@ -4844,11 +4848,17 @@ bool TWPartitionManager::Unmap_Super_Devices() {
+@@ -4844,20 +4848,28 @@ bool TWPartitionManager::Unmap_Super_Devices() {
  		LOGINFO("Checking partition: %s\n", (*iter)->Get_Mount_Point().c_str());
  		if ((*iter)->Is_Super) {
  			TWPartition *part = *iter;
@@ -1516,15 +1516,29 @@ index 0ea3a125..f37cd0ca 100755
  			if (DataManager::GetIntValue("of_ab_device") == 1 || DataManager::GetStrValue("tw_has_boot_slots") == "1")
  				blk_device_partition.append(PartitionManager.Get_Active_Slot_Suffix());
 -			(*iter)->UnMount(false);
-+			if (!(*iter)->UnMount(false)) {
+-			LOGINFO("removing dynamic partition: %s\n", blk_device_partition.c_str());
+-			destroyed = DestroyLogicalPartition(blk_device_partition);
++			bool force_lazy_umount = (bare_partition_name == "odm");
++			if (!(*iter)->UnMount(false) || force_lazy_umount) {
 +				LOGINFO("UnMount failed for '%s', forcing lazy unmount before destroying it\n", (*iter)->Get_Mount_Point().c_str());
 +				TWFunc::Exec_Cmd("umount -l " + (*iter)->Get_Mount_Point());
 +				usleep(200000);
 +			}
- 			LOGINFO("removing dynamic partition: %s\n", blk_device_partition.c_str());
- 			destroyed = DestroyLogicalPartition(blk_device_partition);
++			bool cow_destroyed = true;
  			std::string cow_partition = blk_device_partition + "-cow";
-@@ -4875,13 +4885,25 @@ bool TWPartitionManager::Unmap_Super_Devices() {
+ 			std::string cow_partition_path = "/dev/block/mapper/" + cow_partition;
+ 			struct stat st;
+ 			if (lstat(cow_partition_path.c_str(), &st) == 0) {
+ 				LOGINFO("removing cow partition: %s\n", cow_partition.c_str());
+-				destroyed = DestroyLogicalPartition(cow_partition);
++				cow_destroyed = DestroyLogicalPartition(cow_partition);
+ 			}
++			LOGINFO("removing dynamic partition: %s\n", blk_device_partition.c_str());
++			destroyed = DestroyLogicalPartition(blk_device_partition) && cow_destroyed;
+ 			iter = Partitions.erase(iter);
+ 			delete part;
+ 			if (!destroyed) {
+@@ -4875,13 +4887,25 @@ bool TWPartitionManager::Unmap_Super_Devices() {
  		while ((de = readdir(d)) != NULL) {
  			if (de->d_type == DT_LNK) {
  				std::string partition = de->d_name;
@@ -1557,7 +1571,19 @@ index 0ea3a125..f37cd0ca 100755
  				}
  			}
  		}
-@@ -4916,45 +4938,272 @@ bool TWPartitionManager::Check_Pending_Merges() {
+@@ -4897,11 +4921,6 @@ bool TWPartitionManager::Check_Pending_Merges() {
+ 		return false;
+ 	}
+ 
+-	if (!Unmap_Super_Devices()) {
+-		LOGERR("Unable to unmap dynamic partitions.\n");
+-		return false;
+-	}
+-
+ 	auto callback = [&]() -> void {
+ 		double progress;
+ 		sm->GetUpdateState(&progress);
+@@ -4916,45 +4935,272 @@ bool TWPartitionManager::Check_Pending_Merges() {
  	return true;
  }
  
