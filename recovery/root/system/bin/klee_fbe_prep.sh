@@ -1,4 +1,8 @@
 #!/system/bin/sh
+# Embedded-Weaver bring-up: waits until /data + TEE/keymint/gatekeeper are
+# up, then starts the country-appropriate Weaver backend
+# (CN -> Xiaomi weaver, Global -> NXP weaver + authsecret chain).
+# Exit codes 20-25 signal which stage failed.
 
 logk() {
     echo "klee_fbe_prep: $*" > /dev/kmsg

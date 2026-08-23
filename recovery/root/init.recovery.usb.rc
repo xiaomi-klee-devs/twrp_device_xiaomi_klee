@@ -1,3 +1,9 @@
+# ============================================================================
+# USB gadget configuration (configfs)
+# Defines adb / MTP / sideload / fastboot gadget compositions. Xiaomi VID
+# 0x2717 is used for MTP; Google IDs for adb/sideload/fastboot.
+# ============================================================================
+
 on early-init
     setprop sys.usb.configfs 0
 

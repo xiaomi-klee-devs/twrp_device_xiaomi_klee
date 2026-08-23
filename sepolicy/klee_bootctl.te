@@ -1,4 +1,13 @@
+# ----------------------------------------------------------------------------
+# klee_bootctl.te - UFS boot-control HAL access
+#
+# The AIDL bootctl HAL (android.hardware.boot-service.mtk) needs raw I/O on
+# the UFS bsg device to query/switch slots on this MTK platform.
+# ----------------------------------------------------------------------------
+
+# SELinux type for the UFS Boot Statistics/control character device
 type klee_ufs_bootctl_device, dev_type;
 
+# Raw (unbuffered) access is required for UFS refclk/query ioctls
 allow hal_bootctl_default self:capability sys_rawio;
 allow hal_bootctl_default klee_ufs_bootctl_device:chr_file rw_file_perms;

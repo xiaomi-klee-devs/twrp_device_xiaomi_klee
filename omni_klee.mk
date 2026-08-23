@@ -1,3 +1,4 @@
+# Omni-style product alias (kept for trees/tools that lunch omni_<device>).
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 $(call inherit-product, vendor/twrp/config/common.mk)
@@ -12,6 +13,7 @@ PRODUCT_RELEASE_NAME := POCO X8 Pro
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 
+# Match the stock ROM fingerprint so OTA checks / props look original.
 BUILD_FINGERPRINT := POCO/klee_global/klee:16/BP2A.250605.031.A3/OS3.0.306.0.WPJMIXM:user/release-keys
 PRIVATE_BUILD_DESC := miodm_klee-user 16 BP2A.250605.031.A3 OS3.0.306.0.WPJMIXM release-keys
 

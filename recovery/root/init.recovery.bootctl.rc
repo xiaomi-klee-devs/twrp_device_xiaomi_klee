@@ -1,3 +1,9 @@
+# ============================================================================
+# AIDL boot control HAL wrapper (slot switching for A/B OTA)
+# Runs the MTK boot service with libklee_libcxx_compat preloaded to satisfy
+# its libc++ verbose-abort dependency in the APEX-less recovery env.
+# ============================================================================
+
 service vendor.boot-default /vendor/bin/hw/android.hardware.boot-service.mtk
     class early_hal
     user root

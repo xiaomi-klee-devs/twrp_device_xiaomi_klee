@@ -1,2 +1,7 @@
+# ----------------------------------------------------------------------------
+# Device-specific device node labels
+# ----------------------------------------------------------------------------
+# sdc1: misc partition copy used by MTK bootloader communication
 /dev/block/sdc1 u:object_r:misc_block_device:s0
+# ufs-bsg0: UFS bsg control device (slot switching via bootctl HAL)
 /dev/ufs-bsg0 u:object_r:klee_ufs_bootctl_device:s0

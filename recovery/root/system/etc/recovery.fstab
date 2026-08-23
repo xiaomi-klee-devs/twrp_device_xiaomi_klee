@@ -1,3 +1,10 @@
+# ============================================================================
+# Recovery mount table - POCO X8 Pro / Redmi Turbo 5 (klee, MT6899)
+# Each dynamic partition is listed twice (erofs first, then ext4 fallback)
+# because MIUI/HyperOS ships a mix of both formats.
+# ============================================================================
+
+# --- Dynamic (super) partitions ---------------------------------------------
 system                                                 /system                erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 system                                                 /system                ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 vendor                                                 /vendor                erofs   ro                                                  wait,slotselect,logical,first_stage_mount
@@ -5,6 +12,7 @@ vendor                                                 /vendor                ex
 product                                                /product               erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 product                                                /product               ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 
+# mi_ext carries Xiaomi's shared OEM resources overlaid onto product/system
 mi_ext                                                 /mnt/vendor/mi_ext     erofs   ro                                                  wait,slotselect,logical,first_stage_mount,nofail
 mi_ext                                                 /mnt/vendor/mi_ext     ext4    ro                                                  wait,slotselect,logical,first_stage_mount,nofail
 
@@ -19,18 +27,23 @@ vendor_dlkm                                            /vendor_dlkm           ex
 odm_dlkm                                               /odm_dlkm              erofs   ro                                                  wait,slotselect,logical,first_stage_mount
 odm_dlkm                                               /odm_dlkm              ext4    ro                                                  wait,slotselect,logical,first_stage_mount
 
+# --- Data & metadata ----------------------------------------------------------
+# userdata is FBE-encrypted (fscrypt v2 + metadata encryption); recovery only
+# needs the raw block for wipe/format - decryption happens through vold/FBE.
 /dev/block/by-name/metadata                            /metadata              f2fs    noatime,nosuid,nodev,discard                        wait,check,formattable,first_stage_mount
 /dev/block/by-name/userdata                            /data                  f2fs    noatime,nosuid,nodev,discard,noflush_merge,fsync_mode=nobarrier,reserve_root=134217,resgid=1065,gc_merge,atgc,age_extent_cache,inlinecrypt wait,check,formattable,quota,latemount,resize,reservedsize=128m,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized,keydirectory=/metadata/vold/metadata_encryption,fsverity
 /dev/block/by-name/misc                                /misc                  emmc    defaults                                            defaults
 /dev/block/by-name/persist                             /persist               ext4    noatime,nosuid,nodev,barrier=1                      wait
 /dev/block/by-name/rescue                              /cache                 ext4    noatime,nosuid,nodev,barrier=1                      wait
 
+# --- MTK persistent vendor storage --------------------------------------------
 /dev/block/by-name/protect1                            /mnt/vendor/protect_f  ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
 /dev/block/by-name/protect2                            /mnt/vendor/protect_s  ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
 /dev/block/by-name/nvdata                              /mnt/vendor/nvdata     ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
 /dev/block/by-name/md_sec                              /mnt/vendor/md_sec     ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
 /dev/block/by-name/nvcfg                               /mnt/vendor/nvcfg      ext4    noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc wait,check,formattable
 
+# --- Firmware & boot partitions (raw emmc access for backup/flash) -----------
 /dev/block/by-name/frp                                 /persistent            emmc    defaults                                             defaults
 /dev/block/by-name/nvram                               /nvram                 emmc    defaults                                             defaults
 /dev/block/by-name/proinfo                             /proinfo               emmc    defaults                                             defaults

@@ -1,3 +1,10 @@
+# ============================================================================
+# Main device init rc (MT6899 / klee)
+# Imports the boot-control and keymint/TEE service definitions and sets up
+# early boot props, SELinux enforcing, USB controller and the loader
+# services started on `boot`.
+# ============================================================================
+
 import /init.recovery.bootctl.rc
 import /init.recovery.keymint.rc
 
@@ -13,7 +20,7 @@ on init
 on property:servicemanager.ready=true
     start vendor.boot-default
 
-service load-touch-module /sbin/sh /system/bin/load-touch-modules.sh
+service load-touch-modules /sbin/sh /system/bin/load-touch-modules.sh
     user root
     group root
     oneshot
@@ -27,7 +34,7 @@ service create-bootdevice-link /sbin/sh /system/bin/create-bootdevice-link.sh
     disabled
     seclabel u:r:recovery:s0
 
-service awinic-haptics-loader /system/bin/load-haptics-module.sh
+service load-haptic-modules /system/bin/load-haptic-modules.sh
     disabled
     oneshot
     user root
@@ -37,6 +44,6 @@ service awinic-haptics-loader /system/bin/load-haptics-module.sh
 on boot
     start boot-hal-1-2
     start health-hal-2-1
-    start load-touch-module
+    start load-touch-modules
     start create-bootdevice-link
-    start awinic-haptics-loader
+    start load-haptic-modules
