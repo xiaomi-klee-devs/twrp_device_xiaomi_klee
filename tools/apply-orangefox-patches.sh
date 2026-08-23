@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+# ============================================================================
+# apply-orangefox-patches.sh - patch OrangeFox sources for klee
+#
+# Usage: tools/apply-orangefox-patches.sh [path-to-fox-tree]
+#
+# Applies each idempotent patch from patches/ onto its target repo:
+#   orangefox-build-make.patch   -> build/make       (recovery Soong support)
+#   orangefox-recovery.patch     -> bootable/recovery (klee runtime fixes)
+#   orangefox-system-core.patch  -> system/core      (init/logd adjustments)
+# A patch already applied is detected via `git apply --reverse --check` and
+# skipped. Afterwards the extra Fox languages are copied into the common
+# theme, validated with xmllint, and tools/verify-build-inputs.sh runs.
+# ============================================================================
 set -euo pipefail
 
 DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"

@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
+# ============================================================================
+# compile.sh - OrangeFox build entry point for klee (low-RAM profile)
+#
+# Usage: ./tools/compile.sh [targets...]   (default: adbd vendorbootimage)
+#
+# - Locates the OrangeFox source tree (ORANGEFOX_TOP, ../.., or ~/fox_14.1)
+# - Re-exports the low-RSS build profile from vendorsetup.sh
+# - Requires >= 12 GiB swap; renices itself to stay responsive
+# - Tees full build output into out/logs/klee-lowmem-*.log
+# - After a vendorbootimage build, repacks the system-compatible image via
+#   tools/build-system-compatible-vendor-boot.sh
+# ============================================================================
 set -euo pipefail
 
 DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -77,7 +89,7 @@ set -e
 if [ "${status}" -ne 0 ]; then
     echo "build failed; see ${LOG_FILE}" >&2
 elif printf ' %s ' "${TARGETS[*]}" | grep -q ' vendorbootimage '; then
-    if ! "${DEVICE_DIR}/tools/build-system-compatible-vendor-boot.sh"; then
+    if ! "${DEVICE_DIR}/build-system-compatible-vendor-boot.sh"; then
         echo "system-compatible vendor_boot repack failed" >&2
         status=1
     fi

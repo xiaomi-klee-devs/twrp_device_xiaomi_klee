@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Build a klee vendor-boot DTB without Android USB offload coupling."""
+"""Build a klee vendor-boot DTB without Android USB offload coupling.
+
+Reads the stock MTK-wrapped DTB (prebuilt/dtb/mt6899-klee.dtb), removes the
+`mediatek,usb-offload` property from the xhci0 node so the recovery kernel
+does not bind USB offload to a missing userspace service, and writes an
+unwrapped/padded copy ready for mkbootimg --dtb.
+"""
 
 import argparse
 import pathlib

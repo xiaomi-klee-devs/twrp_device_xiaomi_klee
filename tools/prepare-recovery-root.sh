@@ -1,5 +1,21 @@
 #!/bin/bash
-
+# ============================================================================
+# prepare-recovery-root.sh - OrangeFox BOARD_RECOVERY_IMAGE_PREPARE hook
+#
+# Called once (with --first-call) right after the recovery ramdisk is
+# assembled. Slims the ramdisk so vendor_boot stays under 64 MiB:
+#   1. refresh libminuitwrp.so from the current build output
+#   2. keep only the touch/haptic/misc .ko modules klee actually needs
+#   3. force MiSans font in all theme XMLs, drop unused fonts
+#   4. keep only the languages this build ships
+#   5. remove lpdump/snapshot daemons superseded by lptools
+#   6. strip .gnu_debugdata sections, UPX-pack selected binaries
+#   7. move /sbin duplicates into /system/bin (symlinked back)
+#   8. trim terminfo to ansi/linux/vt100/xterm/xterm-256color
+#
+# NOTE: upx_binaries below must exist or the build FAILS on purpose - keep it
+# in sync with what TWRP/OFOX install into /system/bin.
+# ============================================================================
 set -e
 
 ramdisk="$1"

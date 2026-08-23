@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+# ============================================================================
+# verify-build-inputs.sh - preflight checks before building
+#
+# Usage: tools/verify-build-inputs.sh [path-to-fox-tree]
+#
+# 1. Compares the synced OrangeFox tree against the pinned manifest
+#    (manifests/orangefox-fox_14.1-pinned.xml); bypass with
+#    RODIN_ALLOW_UNPINNED_SOURCE=1.
+# 2. `bash -n` syntax-checks every device-tree shell script.
+# 3. Syntax-checks the Python helpers via --help.
+# ============================================================================
 set -euo pipefail
 
 DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
@@ -18,8 +29,8 @@ if [[ "${RODIN_ALLOW_UNPINNED_SOURCE:-0}" != "1" ]]; then
 fi
 
 for script in \
-    "${DEVICE_DIR}/build-lowmem.sh" \
-    "${DEVICE_DIR}/fox_callback.sh" \
+    "${DEVICE_DIR}/tools/compile.sh" \
+    "${DEVICE_DIR}/tools/prepare-recovery-root.sh" \
     "${DEVICE_DIR}/tools/apply-orangefox-patches.sh" \
     "${DEVICE_DIR}/tools/build-system-compatible-vendor-boot.sh" \
     "${DEVICE_DIR}/tools/collect-compat-report.sh" \

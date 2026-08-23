@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""Verify a synced OrangeFox tree matches the pinned repo manifest.
+
+Compares every <project> entry of manifests/orangefox-fox_14.1-pinned.xml
+against the actual git HEAD of the corresponding checkout under the source
+tree, so builds are reproducible. Used by tools/verify-build-inputs.sh.
+"""
 
 import argparse
 import subprocess

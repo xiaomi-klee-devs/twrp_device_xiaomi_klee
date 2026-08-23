@@ -340,7 +340,7 @@ jobs:
           export SOONG_UI_NINJA_ARGS="$NINJA_ARGS"
           printf 'Using %s Ninja jobs\n' "$build_jobs"
 
-          device/xiaomi/klee/build-lowmem.sh vendorbootimage 2>&1 | \
+          device/xiaomi/klee/tools/compile.sh vendorbootimage 2>&1 | \
             tee "$GITHUB_WORKSPACE/orangefox-build.log"
 
       - name: Collect release artifact

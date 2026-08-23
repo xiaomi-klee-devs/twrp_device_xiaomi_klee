@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
+# ============================================================================
+# build-system-compatible-vendor-boot.sh - final vendor_boot repack
+#
+# Usage: tools/build-system-compatible-vendor-boot.sh [product_out] [output.img]
+#
+# The stock platform ramdisk fragment (prebuilt/stock_vendor_ramdisk.cpio.lz4)
+# is unpacked and pruned of every binary the OrangeFox recovery fragment
+# already provides, then repacked together with:
+#   - patched DTB (tools/patch-vendor-boot-dtb.py drops USB offload nodes)
+#   - the freshly built recovery.cpio.lz4 as a RECOVERY ramdisk fragment
+# The result is AVB-signed and copied out as both
+#   OrangeFox-R12.0-Unofficial-klee-system-compatible.img  (flashable via OTA tools)
+#   OrangeFox-R12.0-Unofficial-klee.img (+ .md5)           (fastboot-friendly copy)
+# ============================================================================
 set -euo pipefail
 
 DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 TOP_DIR="$(cd -- "${DEVICE_DIR}/../../.." && pwd -P)"
 PRODUCT_OUT="${1:-${OUT_DIR:-${TOP_DIR}/out}/target/product/klee}"
 
-STOCK_RAMDISK="${DEVICE_DIR}/prebuilt/vendor_ramdisk00"
+STOCK_RAMDISK="${DEVICE_DIR}/prebuilt/stock_vendor_ramdisk.cpio.lz4"
 DEFAULT_OUTPUT_IMAGE="${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
 OUTPUT_IMAGE="${2:-${DEFAULT_OUTPUT_IMAGE}}"
 STOCK_DTB="${DEVICE_DIR}/prebuilt/dtb/mt6899-klee.dtb"
