@@ -1,3 +1,12 @@
+/*
+ * klee_omapi_bridge - OMAPI service for OrangeFox recovery.
+ *
+ * Publishes android.se.omapi.ISecureElementService/default backed by the
+ * eSE1 Secure Element HAL, so SIM-based credential decryption (OMAPI flows)
+ * works inside recovery. Implements channel multiplexing, GET STATUS
+ * handling and SELECT NEXT on top of the raw HAL transmit() call.
+ */
+
 #include <aidl/android/hardware/secure_element/BnSecureElementCallback.h>
 #include <aidl/android/hardware/secure_element/ISecureElement.h>
 #include <aidl/android/hardware/secure_element/LogicalChannelResponse.h>

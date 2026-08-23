@@ -1,3 +1,12 @@
+/*
+ * libc++ verbose-abort shim for recovery.
+ *
+ * Vendor HAL binaries (keymint/gatekeeper) reference
+ * __libcpp_verbose_abort from the NDK libc++, which is absent in the APEX-less
+ * recovery environment. This translation unit defines the symbol (matching
+ * the mangled name) so linking succeeds; at runtime it logs and aborts.
+ */
+
 #include <android/log.h>
 #include <stdarg.h>
 #include <stdlib.h>

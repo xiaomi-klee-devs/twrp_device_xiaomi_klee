@@ -1,6 +1,21 @@
+// ============================================================================
+// Soong modules for the klee OrangeFox device tree
+//
+// Single module-definition file for the whole tree; all first-party C/C++
+// sources live under src/<module>/, stock prebuilt libraries under
+// recovery/root/vendor/lib64/.
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Minimal libc++ shim: vendor HALs (keymint/gatekeeper) are prelinked against
+// __libcpp_verbose_abort from the NDK libc++, which is absent in the APEX-less
+// recovery environment. This library redirects that symbol to a fatal log +
+// abort(). Built with stl:none to avoid a circular dependency on the very STL
+// it patches. Preloaded via LD_PRELOAD by the TEE/Weaver services.
+// ----------------------------------------------------------------------------
 cc_library_shared {
     name: "libklee_libcxx_compat",
-    srcs: ["libcxx_compat/libcxx_compat.cpp"],
+    srcs: ["src/libcxx_compat/libcxx_compat.cpp"],
     compile_multilib: "64",
     recovery_available: true,
     stl: "none",
@@ -11,6 +26,11 @@ cc_library_shared {
     ],
 }
 
+// ----------------------------------------------------------------------------
+// Prebuilt AIDL stable-C libraries taken from the stock ROM. The OMAPI bridge
+// links against these instead of generating sources twice; check_elf_files is
+// disabled because their NDK dependencies are satisfied at runtime.
+// ----------------------------------------------------------------------------
 cc_prebuilt_library_shared {
     name: "klee_android.hardware.secure_element-V1-ndk",
     srcs: ["recovery/root/vendor/lib64/android.hardware.secure_element-V1-ndk.so"],
@@ -29,10 +49,16 @@ cc_prebuilt_library_shared {
     stl: "none",
 }
 
+// ----------------------------------------------------------------------------
+// OMAPI service bridge for recovery: exposes android.se.omapi on top of the
+// eSE1 Secure Element HAL so credential/SIM decryption flows work in recovery.
+// generated_headers provide the AIDL stubs; the prebuilt libs above satisfy
+// them at link time without pulling the full HAL build into the tree.
+// ----------------------------------------------------------------------------
 cc_binary {
     name: "klee_omapi_bridge",
     recovery: true,
-    srcs: ["omapi_bridge/omapi_bridge.cpp"],
+    srcs: ["src/omapi_bridge/omapi_bridge.cpp"],
     generated_headers: [
         "android.hardware.secure_element-V1-ndk-source",
         "android.se.omapi-V1-ndk-source",
@@ -49,5 +75,25 @@ cc_binary {
         "-Wall",
         "-Wextra",
         "-Werror",
+    ],
+}
+
+// ----------------------------------------------------------------------------
+// create_pl_dev - maps the raw preloader partitions (preloader_raw_a/b) into
+// /dev/block/mapper devices so A/B updates can flash the preloader regardless
+// of storage type: UFS (sda/sdb) or eMMC (mmcblk0boot0/1). Its init rc creates
+// the expected by-name symlinks and starts the daemon post-fs.
+// ----------------------------------------------------------------------------
+cc_binary {
+    name: "create_pl_dev",
+    srcs: ["src/create_pl_dev/create_pl_dev.cpp"],
+    init_rc: ["src/create_pl_dev/create_pl_dev.rc"],
+    recovery_available: true,
+    static_libs: [
+        "libfs_mgr",
+    ],
+    shared_libs: [
+        "libbase",
+        "liblog",
     ],
 }
