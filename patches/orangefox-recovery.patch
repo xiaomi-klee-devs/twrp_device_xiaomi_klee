@@ -2024,10 +2024,10 @@ index c9fdc57..f067389 100644
  	// Language
  	PageManager::LoadLanguage(DataManager::GetStrValue("tw_language"));
 diff --git a/twrpApex.cpp b/twrpApex.cpp
-index 557283b..784c2b6 100755
+index 557283b..e8ce7c3 100755
 --- a/twrpApex.cpp
 +++ b/twrpApex.cpp
-@@ -12,9 +12,7 @@ bool twrpApex::loadApexImages() {
+@@ -12,12 +12,9 @@ bool twrpApex::loadApexImages() {
  	char* additionalApexFiles = std::strtok(additionalFiles, " ");
  #endif
  
@@ -2036,8 +2036,11 @@ index 557283b..784c2b6 100755
 -	apexFiles.push_back(APEX_DIR "/com.android.tzdata.apex");
  	apexFiles.push_back(APEX_DIR "/com.android.art.release.apex");
  	apexFiles.push_back(APEX_DIR "/com.google.android.media.swcodec.apex");
- 	apexFiles.push_back(APEX_DIR "/com.android.media.swcodec.apex");
-@@ -116,7 +114,9 @@ bool twrpApex::mountApexOnLoopbackDevices(std::vector<std::string> apexFiles) {
+-	apexFiles.push_back(APEX_DIR "/com.android.media.swcodec.apex");
+ 
+ #ifdef TW_ADDITIONAL_APEX_FILES
+ 	while(additionalApexFiles) {
+@@ -116,7 +113,9 @@ bool twrpApex::mountApexOnLoopbackDevices(std::vector<std::string> apexFiles) {
  		}
  		bool load_result = loadApexImage(fileToMount, device_no);
  		if (!load_result) {
