@@ -2,7 +2,7 @@
 # Loads the haptic kernel modules and probes which driver (aw8697 'awinic'
 # or ICS) binds; publishes vendor.haptics.ready/driver props on success.
 
-sleep 20
+sleep 1
 
 if ! grep -q '^haptic ' /proc/modules; then
     insmod /lib/modules/haptic.ko 2>/dev/null
