@@ -1,5 +1,5 @@
 diff --git a/data.cpp b/data.cpp
-index 7ca8d86b..1a8bbe88 100755
+index 7ca8d86..1a8bbe8 100755
 --- a/data.cpp
 +++ b/data.cpp
 @@ -369,25 +369,29 @@ int DataManager::SaveValues()
@@ -57,7 +57,7 @@ index 7ca8d86b..1a8bbe88 100755
  #endif
 -
 diff --git a/gui/action.cpp b/gui/action.cpp
-index 42e30797..aa568b97 100755
+index 42e3079..aa568b9 100755
 --- a/gui/action.cpp
 +++ b/gui/action.cpp
 @@ -967,6 +967,19 @@ int GUIAction::mount(std::string arg)
@@ -100,7 +100,7 @@ index 42e30797..aa568b97 100755
      {
        PartitionManager.UnMount_By_Path(arg, true);
 diff --git a/gui/gui.cpp b/gui/gui.cpp
-index 71bbc967..4291f2aa 100644
+index 71bbc96..4291f2a 100644
 --- a/gui/gui.cpp
 +++ b/gui/gui.cpp
 @@ -122,6 +122,7 @@ public:
@@ -249,7 +249,7 @@ index 71bbc967..4291f2aa 100644
  		touch_status = TS_NONE;
  #ifdef TW_USE_KEY_CODE_TOUCH_SYNC
 diff --git a/gui/theme/common/languages/ja_JP.xml b/gui/theme/common/languages/ja_JP.xml
-index 40d7d6e6..fc62815f 100644
+index 40d7d6e..fc62815 100644
 --- a/gui/theme/common/languages/ja_JP.xml
 +++ b/gui/theme/common/languages/ja_JP.xml
 @@ -1,6 +1,6 @@
@@ -261,7 +261,7 @@ index 40d7d6e6..fc62815f 100644
  	<resources>
  		<!-- Font overrides - only change these if your language requires special characters -->
 diff --git a/gui/theme/extra-languages/languages/zh_CN.xml b/gui/theme/extra-languages/languages/zh_CN.xml
-index cd4100f4..d1aca5b5 100644
+index cd4100f..d1aca5b 100644
 --- a/gui/theme/extra-languages/languages/zh_CN.xml
 +++ b/gui/theme/extra-languages/languages/zh_CN.xml
 @@ -885,7 +885,7 @@
@@ -274,7 +274,7 @@ index cd4100f4..d1aca5b5 100644
  		<string name="font_small">小</string>
  		<string name="font_norm">标准</string>
 diff --git a/gui/theme/portrait_hdpi/pages/customization.xml b/gui/theme/portrait_hdpi/pages/customization.xml
-index 3d5cc9b3..fed8df35 100644
+index 3d5cc9b..fed8df3 100644
 --- a/gui/theme/portrait_hdpi/pages/customization.xml
 +++ b/gui/theme/portrait_hdpi/pages/customization.xml
 @@ -818,51 +818,9 @@
@@ -395,7 +395,7 @@ index 3d5cc9b3..fed8df35 100644
  						[[ '%update_navbar%' = '1' ]] || exit;
  					else
 diff --git a/gui/theme/portrait_hdpi/pages/mount.xml b/gui/theme/portrait_hdpi/pages/mount.xml
-index 2c15dc91..8feeee53 100644
+index 2c15dc9..8feeee5 100644
 --- a/gui/theme/portrait_hdpi/pages/mount.xml
 +++ b/gui/theme/portrait_hdpi/pages/mount.xml
 @@ -105,6 +105,50 @@
@@ -450,7 +450,7 @@ index 2c15dc91..8feeee53 100644
  
  			<action>
 diff --git a/gui/theme/portrait_hdpi/resources/images.xml b/gui/theme/portrait_hdpi/resources/images.xml
-index 1d8dec09..cf763f95 100644
+index 1d8dec0..cf763f9 100644
 --- a/gui/theme/portrait_hdpi/resources/images.xml
 +++ b/gui/theme/portrait_hdpi/resources/images.xml
 @@ -55,6 +55,7 @@
@@ -462,7 +462,7 @@ index 1d8dec09..cf763f95 100644
  		<font name="orangefont" filename="InterDisplay-Regular.ttf" size="42"/>
  		<font name="about" filename="InterDisplay-Medium.ttf" size="58"/>
 diff --git a/gui/theme/portrait_hdpi/themes/accent.xml b/gui/theme/portrait_hdpi/themes/accent.xml
-index eeb54172..de0913b5 100644
+index eeb5417..de0913b 100644
 --- a/gui/theme/portrait_hdpi/themes/accent.xml
 +++ b/gui/theme/portrait_hdpi/themes/accent.xml
 @@ -2,22 +2,22 @@
@@ -502,7 +502,7 @@ index eeb54172..de0913b5 100644
  	</variables>
  </recovery>
 diff --git a/gui/theme/portrait_hdpi/themes/font.xml b/gui/theme/portrait_hdpi/themes/font.xml
-index eb9ca2bf..f877c986 100644
+index eb9ca2b..f877c98 100644
 --- a/gui/theme/portrait_hdpi/themes/font.xml
 +++ b/gui/theme/portrait_hdpi/themes/font.xml
 @@ -34,9 +34,9 @@
@@ -520,7 +520,7 @@ index eb9ca2bf..f877c986 100644
 \ No newline at end of file
 +</recovery>
 diff --git a/gui/theme/portrait_hdpi/themes/navbar.xml b/gui/theme/portrait_hdpi/themes/navbar.xml
-index bd964771..64243e91 100644
+index bd96477..64243e9 100644
 --- a/gui/theme/portrait_hdpi/themes/navbar.xml
 +++ b/gui/theme/portrait_hdpi/themes/navbar.xml
 @@ -1,9 +1,9 @@
@@ -539,7 +539,7 @@ index bd964771..64243e91 100644
  </recovery>
 \ No newline at end of file
 diff --git a/gui/theme/portrait_hdpi/themes/style.xml b/gui/theme/portrait_hdpi/themes/style.xml
-index 39512a12..2517a74a 100644
+index 39512a1..2517a74 100644
 --- a/gui/theme/portrait_hdpi/themes/style.xml
 +++ b/gui/theme/portrait_hdpi/themes/style.xml
 @@ -1,290 +1,292 @@
@@ -1126,7 +1126,7 @@ index 39512a12..2517a74a 100644
 +	</variables>
 +</recovery>
 diff --git a/minuitwrp/events.cpp b/minuitwrp/events.cpp
-index e497df62..ccf5165a 100644
+index e497df6..3c481a0 100644
 --- a/minuitwrp/events.cpp
 +++ b/minuitwrp/events.cpp
 @@ -27,6 +27,7 @@
@@ -1174,7 +1174,7 @@ index e497df62..ccf5165a 100644
      return 0;
  }
 diff --git a/minuitwrp/graphics.cpp b/minuitwrp/graphics.cpp
-index 8e22b640..97a85fd9 100644
+index 8e22b64..97a85fd 100644
 --- a/minuitwrp/graphics.cpp
 +++ b/minuitwrp/graphics.cpp
 @@ -114,7 +114,9 @@ int gr_textEx_scaleW(int x, int y, const char *s, void* pFont, int max_width, in
@@ -1189,7 +1189,7 @@ index 8e22b640..97a85fd9 100644
  
  void gr_clip(int x, int y, int w, int h)
 diff --git a/minuitwrp/include/minuitwrp/truetype.hpp b/minuitwrp/include/minuitwrp/truetype.hpp
-index 72b7620a..f096a230 100755
+index 72b7620..f096a23 100755
 --- a/minuitwrp/include/minuitwrp/truetype.hpp
 +++ b/minuitwrp/include/minuitwrp/truetype.hpp
 @@ -64,6 +64,7 @@ typedef struct {
@@ -1209,7 +1209,7 @@ index 72b7620a..f096a230 100755
      static void gr_ttf_calcMaxFontHeight(TrueTypeFont *f);
      static int gr_ttf_render_text(TrueTypeFont *font, GGLSurface *surface, const std::string text, int max_width);
 diff --git a/minuitwrp/truetype.cpp b/minuitwrp/truetype.cpp
-index d224fbb1..e15894cb 100644
+index d224fbb..e15894c 100644
 --- a/minuitwrp/truetype.cpp
 +++ b/minuitwrp/truetype.cpp
 @@ -35,6 +35,9 @@ static FontData font_data = {
@@ -1405,9 +1405,18 @@ index d224fbb1..e15894cb 100644
  			FT_Get_Kerning(f->face, prev_idx, char_idx, FT_KERNING_DEFAULT, &delta);
  			total_w += delta.x >> 6;
 diff --git a/orangefox.mk b/orangefox.mk
-index 1f02b296..efb82ecd 100644
+index 1f02b29..9f8775c 100644
 --- a/orangefox.mk
 +++ b/orangefox.mk
+@@ -53,7 +53,7 @@ endif
+ 
+ OF_CURRENT_BRANCH := $(shell git -C $(call my-dir) branch --show-current 2>/dev/null)
+ ifeq ($(OF_CURRENT_BRANCH),)
+-    LOCAL_CFLAGS += -DOF_CURRENT_BRANCH='"broken repo"'
++    LOCAL_CFLAGS += -DOF_CURRENT_BRANCH='"fox_14.1"'
+ else
+     LOCAL_CFLAGS += -DOF_CURRENT_BRANCH='"$(OF_CURRENT_BRANCH)"'
+ endif
 @@ -697,6 +697,16 @@ ifeq ($(FOX_ALLOW_EARLY_SETTINGS_LOAD),1)
      LOCAL_CFLAGS += -DFOX_ALLOW_EARLY_SETTINGS_LOAD='"1"'
  endif
@@ -1426,7 +1435,7 @@ index 1f02b296..efb82ecd 100644
  ifeq ($(OF_WIPE_METADATA_AFTER_DATAFORMAT),1)
     ifeq ($(TW_INCLUDE_FBE_METADATA_DECRYPT),true)
 diff --git a/partition.cpp b/partition.cpp
-index c437cc77..bc6ae359 100644
+index c437cc7..bc6ae35 100644
 --- a/partition.cpp
 +++ b/partition.cpp
 @@ -246,6 +246,7 @@ TWPartition::TWPartition() {
@@ -1514,7 +1523,7 @@ index c437cc77..bc6ae359 100644
 +}
  //* 
 diff --git a/partitionmanager.cpp b/partitionmanager.cpp
-index 0ea3a125..3dd4554d 100755
+index 0ea3a12..3dd4554 100755
 --- a/partitionmanager.cpp
 +++ b/partitionmanager.cpp
 @@ -25,7 +25,9 @@
@@ -1917,7 +1926,7 @@ index 0ea3a125..3dd4554d 100755
  
  std::pair<string, string> TWPartitionManager::Get_Partition_Checksums(TWPartition* twrpPart) {
 diff --git a/partitions.hpp b/partitions.hpp
-index ea1f80b0..56970a7a 100644
+index ea1f80b..56970a7 100644
 --- a/partitions.hpp
 +++ b/partitions.hpp
 @@ -182,6 +182,7 @@ public:
@@ -1937,7 +1946,7 @@ index ea1f80b0..56970a7a 100644
  	string Decrypted_Block_Device;                                            // Decrypted block device available after decryption
  	bool Removable;                                                           // Indicates if this partition is removable -- affects how often we check overall size, if present, etc.
 diff --git a/prebuilt/Android.mk b/prebuilt/Android.mk
-index a0240333..6961575c 100755
+index a024033..6961575 100755
 --- a/prebuilt/Android.mk
 +++ b/prebuilt/Android.mk
 @@ -62,7 +62,10 @@ RECOVERY_LIBRARY_SOURCE_FILES += $(TARGET_RECOVERY_ROOT_OUT)/system/lib64/libkey
@@ -1958,7 +1967,7 @@ index a0240333..6961575c 100755
  endif
 -
 diff --git a/twrp.cpp b/twrp.cpp
-index c9fdc572..f0673899 100644
+index c9fdc57..f067389 100644
 --- a/twrp.cpp
 +++ b/twrp.cpp
 @@ -51,6 +51,7 @@ extern "C" {
@@ -2015,7 +2024,7 @@ index c9fdc572..f0673899 100644
  	// Language
  	PageManager::LoadLanguage(DataManager::GetStrValue("tw_language"));
 diff --git a/twrpApex.cpp b/twrpApex.cpp
-index 557283b1..784c2b6c 100755
+index 557283b..784c2b6 100755
 --- a/twrpApex.cpp
 +++ b/twrpApex.cpp
 @@ -12,9 +12,7 @@ bool twrpApex::loadApexImages() {
@@ -2040,7 +2049,7 @@ index 557283b1..784c2b6c 100755
  		device_no++;
  	}
 diff --git a/twrpRepacker.cpp b/twrpRepacker.cpp
-index ca3f8243..2d1a223c 100755
+index ca3f824..2d1a223 100755
 --- a/twrpRepacker.cpp
 +++ b/twrpRepacker.cpp
 @@ -321,6 +321,43 @@ bool twrpRepacker::Repack_Image_And_Flash(const std::string& Target_Image, const
@@ -2161,7 +2170,7 @@ index ca3f8243..2d1a223c 100755
  #endif
  
 diff --git a/twrpRepacker.hpp b/twrpRepacker.hpp
-index e71f3dcb..8716347e 100755
+index e71f3dc..8716347 100755
 --- a/twrpRepacker.hpp
 +++ b/twrpRepacker.hpp
 @@ -42,6 +42,7 @@ class twrpRepacker {
