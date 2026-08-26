@@ -3,6 +3,14 @@ name: Build and publish OrangeFox klee
 on:
   workflow_dispatch:
     inputs:
+      runner:
+        description: 'Runner to use for the build job'
+        required: true
+        default: self-hosted
+        type: choice
+        options:
+          - self-hosted
+          - ubuntu-24.04
       publish:
         description: Create a prerelease with vendor_boot images
         required: true
@@ -119,7 +127,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 360
 
     steps:
