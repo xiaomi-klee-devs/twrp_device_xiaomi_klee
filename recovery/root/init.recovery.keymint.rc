@@ -35,7 +35,7 @@ service vendor.secure_element_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.
     user system
     group system secure_element nfc
     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
-    setenv LD_PRELOAD /system/lib64/libc++_hos.so
+    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
     seclabel u:r:recovery:s0
     disabled
 
@@ -44,7 +44,7 @@ service klee.omapi_bridge /system/bin/klee_omapi_bridge
     user system
     group system secure_element nfc
     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
-    setenv LD_PRELOAD /system/lib64/libc++_hos.so
+    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
     seclabel u:r:recovery:s0
     disabled
 
