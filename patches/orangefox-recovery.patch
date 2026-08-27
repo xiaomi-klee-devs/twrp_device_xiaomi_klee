@@ -2073,7 +2073,7 @@ index 557283b..e8ce7c3 100755
  		device_no++;
  	}
 diff --git a/twrpRepacker.cpp b/twrpRepacker.cpp
-index ca3f824..2d1a223 100755
+index ca3f824..92fc83b 100755
 --- a/twrpRepacker.cpp
 +++ b/twrpRepacker.cpp
 @@ -321,6 +321,43 @@ bool twrpRepacker::Repack_Image_And_Flash(const std::string& Target_Image, const
@@ -2098,7 +2098,7 @@ index ca3f824..2d1a223 100755
 +	if (slot.empty() || !PartitionManager.Find_Partition_By_Path(dest_partition))
 +		return false;
 +
-+	std::string root = "/dev/block/bootdevice/by-name" + dest_partition;
++	std::string root = "/dev/block/by-name" + dest_partition;
 +	std::string src = (slot == "_a" || slot == "a") ? (root + "_a") : (root + "_b");
 +
 +	std::string tmp_filename = dest_partition.substr(1) + ".img"; // "vendor_boot.img" / "recovery.img"
@@ -2125,9 +2125,10 @@ index ca3f824..2d1a223 100755
  
  	if (!slot.empty() && PartitionManager.Find_Partition_By_Path(dest_partition)) {
 -		std::string root, src, dest;
-+		std::string root, src;
- 		root = "/dev/block/bootdevice/by-name" + dest_partition;
+-		root = "/dev/block/bootdevice/by-name" + dest_partition;
 -		if (slot == "_a" || slot == "a") {
++		std::string root, src;
++		root = "/dev/block/by-name" + dest_partition;
 +		if (slot == "_a" || slot == "a")
  			src = root + "_a";
 -			dest= root + "_b";
