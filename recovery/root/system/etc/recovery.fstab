@@ -1,5 +1,5 @@
 # ============================================================================
-# Recovery mount table - POCO X8 Pro / Redmi Turbo 5 (klee, MT6899)
+# Recovery mount table - POCO X7 Pro / Redmi Turbo 4 (rodin, MT6899)
 # Each dynamic partition is listed twice (erofs first, then ext4 fallback)
 # because MIUI/HyperOS ships a mix of both formats.
 # ============================================================================

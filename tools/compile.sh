@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ============================================================================
-# compile.sh - OrangeFox build entry point for klee (low-RAM profile)
+# compile.sh - OrangeFox build entry point for rodin (low-RAM profile)
 #
 # Usage: ./tools/compile.sh [targets...]   (default: adbd vendorbootimage)
 #
 # - Locates the OrangeFox source tree (ORANGEFOX_TOP, ../.., or ~/fox_14.1)
 # - Re-exports the low-RSS build profile from vendorsetup.sh
 # - Requires >= 12 GiB swap; renices itself to stay responsive
-# - Tees full build output into out/logs/klee-lowmem-*.log
+# - Tees full build output into out/logs/rodin-lowmem-*.log
 # - After a vendorbootimage build, repacks the system-compatible image via
 #   tools/build-system-compatible-vendor-boot.sh
 # ============================================================================
@@ -37,7 +37,7 @@ fi
 export OF_LOW_MEMORY_BUILD="${OF_LOW_MEMORY_BUILD:-1}"
 export OF_BUILD_JOBS="${OF_BUILD_JOBS:-1}"
 export ALLOW_MISSING_DEPENDENCIES="${ALLOW_MISSING_DEPENDENCIES:-true}"
-export FOX_BUILD_DEVICE="${FOX_BUILD_DEVICE:-klee}"
+export FOX_BUILD_DEVICE="${FOX_BUILD_DEVICE:-rodin}"
 export FOX_AB_DEVICE="${FOX_AB_DEVICE:-1}"
 export FOX_VIRTUAL_AB_DEVICE="${FOX_VIRTUAL_AB_DEVICE:-1}"
 export OF_FORCE_PREBUILT_KERNEL="${OF_FORCE_PREBUILT_KERNEL:-1}"
@@ -66,16 +66,16 @@ if [ "${#TARGETS[@]}" -eq 0 ]; then
     TARGETS=(adbd vendorbootimage)
 fi
 
-LOG_FILE="${LOG_DIR}/klee-lowmem-$(date +%Y%m%d-%H%M%S).log"
+LOG_FILE="${LOG_DIR}/rodin-lowmem-$(date +%Y%m%d-%H%M%S).log"
 
 cd "${TOP_DIR}"
 set +u
 source build/envsetup.sh
-lunch twrp_klee-ap2a-eng
+lunch twrp_rodin-ap2a-eng
 
 if printf ' %s ' "${TARGETS[*]}" | grep -q ' vendorbootimage '; then
-    rm -rf "${OUT_DIR}/target/product/klee/recovery"
-    rm -f "${OUT_DIR}/target/product/klee/obj/PACKAGING/recovery_intermediates/ramdisk_files-timestamp"
+    rm -rf "${OUT_DIR}/target/product/rodin/recovery"
+    rm -f "${OUT_DIR}/target/product/rodin/obj/PACKAGING/recovery_intermediates/ramdisk_files-timestamp"
 fi
 
 echo "log: ${LOG_FILE}"

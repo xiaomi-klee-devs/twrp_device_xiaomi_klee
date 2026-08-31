@@ -1,7 +1,7 @@
 # ============================================================================
 # TEE stack: tee-supplicant + Mitee keymint/gatekeeper HALs
 # Started in order: tee-supplicant -> keymint -> secure element ->
-# klee.fbe_prep (embedded Weaver bring-up, see system/bin/klee_fbe_prep.sh).
+# rodin.fbe_prep (embedded Weaver bring-up, see system/bin/rodin_fbe_prep.sh).
 # ============================================================================
 
 service tee-supplicant /vendor/bin/tee-supplicant
@@ -18,7 +18,7 @@ service vendor.keymint-mitee /vendor/bin/hw/android.hardware.security.keymint@3.
     user system
     group system drmrpc
     setenv LD_LIBRARY_PATH /system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
+    setenv LD_PRELOAD /system/lib64/librodin_libcxx_compat.so
     seclabel u:r:recovery:s0
     disabled
 
@@ -27,7 +27,7 @@ service vendor.gatekeeper_mitee /vendor/bin/hw/android.hardware.gatekeeper-servi
     user system
     group system
     setenv LD_LIBRARY_PATH /system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
+    setenv LD_PRELOAD /system/lib64/librodin_libcxx_compat.so
     seclabel u:r:recovery:s0
 
 service vendor.secure_element_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.secure_element-service
@@ -35,16 +35,16 @@ service vendor.secure_element_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.
     user system
     group system secure_element nfc
     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
+    setenv LD_PRELOAD /system/lib64/librodin_libcxx_compat.so
     seclabel u:r:recovery:s0
     disabled
 
-service klee.omapi_bridge /system/bin/klee_omapi_bridge
+service rodin.omapi_bridge /system/bin/rodin_omapi_bridge
     class hal
     user system
     group system secure_element nfc
     setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
+    setenv LD_PRELOAD /system/lib64/librodin_libcxx_compat.so
     seclabel u:r:recovery:s0
     disabled
 
@@ -80,7 +80,7 @@ service vendor.weaver_xiaomi /vendor/bin/hw/android.hardware.weaver
     seclabel u:r:recovery:s0
     disabled
 
-service klee.fbe_prep /system/bin/klee_fbe_prep.sh
+service rodin.fbe_prep /system/bin/rodin_fbe_prep.sh
     class hal
     user root
     group root system
@@ -124,7 +124,7 @@ on fs
 on property:init.svc.tee-supplicant=running
     start vendor.keymint-mitee
     start vendor.secure_element_hal_service
-    start klee.fbe_prep
+    start rodin.fbe_prep
 
 on property:init.svc.vendor.secure_element_hal_service=running
-    start klee.omapi_bridge
+    start rodin.omapi_bridge

@@ -8,7 +8,7 @@
 
 # --- OrangeFox build-system switches ----------------------------------------
 export ALLOW_MISSING_DEPENDENCIES=true      # recovery-only tree, tolerate gaps
-export FOX_BUILD_DEVICE=klee                # device codename for Fox scripts
+export FOX_BUILD_DEVICE=rodin                # device codename for Fox scripts
 export FOX_AB_DEVICE=1                      # A/B (seamless update) device
 export FOX_VIRTUAL_AB_DEVICE=1              # virtual A/B with snapshots
 

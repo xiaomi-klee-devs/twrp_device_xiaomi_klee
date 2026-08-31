@@ -1,4 +1,4 @@
-name: Build and publish OrangeFox klee
+name: Build and publish OrangeFox rodin
 
 on:
   workflow_dispatch:
@@ -67,7 +67,7 @@ on:
         default: true
         type: boolean
       run_install_devicetree:
-        description: 'Step: Install klee device tree'
+        description: 'Step: Install rodin device tree'
         required: false
         default: true
         type: boolean
@@ -101,7 +101,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: orangefox-klee-${{ github.workflow }}-${{ github.ref }}
+  group: orangefox-rodin-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -130,9 +130,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          image_name="OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
+          image_name="OrangeFox-R12.0-Unofficial-rodin-system-compatible.img"
 
-          echo "artifact_name=orangefox-klee-release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=orangefox-rodin-release-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
           echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
 
       - name: Remove stale build worktree
@@ -193,7 +193,7 @@ jobs:
           required_kib=$((95 * 1024 * 1024))
           if [[ -z "${available_kib}" || "${available_kib}" -lt "${required_kib}" ]]; then
             available_gib=$((available_kib / 1024 / 1024))
-            echo "::error::OrangeFox klee needs at least 95 GiB free after hosted-image cleanup and swap setup; found ${available_gib} GiB."
+            echo "::error::OrangeFox rodin needs at least 95 GiB free after hosted-image cleanup and swap setup; found ${available_gib} GiB."
             echo "::error::Use a GitHub-hosted larger runner if this public standard runner image cannot meet the guard."
             exit 1
           fi
@@ -238,17 +238,17 @@ jobs:
           cd "$ORANGEFOX_SYNC"
           ./orangefox_sync.sh --branch 14.1 --path "$ORANGEFOX_TOP"
 
-      - name: Install klee device tree
+      - name: Install rodin device tree
         if: ${{ inputs.run_install_devicetree != false }}
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$ORANGEFOX_TOP/device/xiaomi/klee"
+          mkdir -p "$ORANGEFOX_TOP/device/xiaomi/rodin"
           rsync -a --delete \
             --exclude .git \
             --exclude images \
             "$GITHUB_WORKSPACE/device-tree/" \
-            "$ORANGEFOX_TOP/device/xiaomi/klee/"
+            "$ORANGEFOX_TOP/device/xiaomi/rodin/"
 
       - name: Build vendor_boot image
         if: ${{ inputs.run_build_vendorboot != false }}
@@ -256,7 +256,7 @@ jobs:
         working-directory: ${{ env.ORANGEFOX_TOP }}
         env:
           ALLOW_MISSING_DEPENDENCIES: 'true'
-          FOX_BUILD_DEVICE: klee
+          FOX_BUILD_DEVICE: rodin
           FOX_AB_DEVICE: '1'
           FOX_VIRTUAL_AB_DEVICE: '1'
           OF_FORCE_PREBUILT_KERNEL: '1'
@@ -273,7 +273,7 @@ jobs:
           export SOONG_UI_NINJA_ARGS="$NINJA_ARGS"
           printf 'Using %s Ninja jobs\n' "$build_jobs"
 
-          device/xiaomi/klee/tools/compile.sh vendorbootimage 2>&1 | \
+          device/xiaomi/rodin/tools/compile.sh vendorbootimage 2>&1 | \
             tee "$GITHUB_WORKSPACE/orangefox-build.log"
 
       - name: Collect release artifact
@@ -283,7 +283,7 @@ jobs:
           IMAGE_NAME: ${{ steps.metadata.outputs.image_name }}
         run: |
           set -euo pipefail
-          product="$ORANGEFOX_TOP/out/target/product/klee"
+          product="$ORANGEFOX_TOP/out/target/product/rodin"
           image="$product/$IMAGE_NAME"
 
           rm -rf "$GITHUB_WORKSPACE/artifacts"
@@ -295,7 +295,7 @@ jobs:
           )
 
           cat > "$GITHUB_WORKSPACE/artifacts/build-info.md" <<EOF
-          Automated OrangeFox build for klee.
+          Automated OrangeFox build for rodin.
 
           - Device-tree commit: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}
           - OrangeFox branch: ${ORANGEFOX_BRANCH}
@@ -317,7 +317,7 @@ jobs:
         if: ${{ always() && inputs.run_upload_diag != false }}
         uses: actions/upload-artifact@v4
         with:
-          name: orangefox-klee-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          name: orangefox-rodin-logs-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             orangefox-build.log
             OrangeFox/out/logs
@@ -336,7 +336,7 @@ jobs:
             "$GITHUB_WORKSPACE/orangefox-build.log"
 
   release:
-    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/klee' && (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/rodin' && (github.event_name == 'workflow_dispatch' && inputs.publish) }}
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -347,7 +347,7 @@ jobs:
       - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: orangefox-klee-release-${{ github.run_id }}-${{ github.run_attempt }}
+          pattern: orangefox-rodin-release-${{ github.run_id }}-${{ github.run_attempt }}
           path: release-artifacts
           merge-multiple: true
 
@@ -356,7 +356,7 @@ jobs:
         run: |
           set -euo pipefail
           cd release-artifacts
-          image="OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
+          image="OrangeFox-R12.0-Unofficial-rodin-system-compatible.img"
           test -f "${image}"
           test -f "${image}.sha256"
           sha256sum --check --strict "${image}.sha256"
@@ -368,10 +368,10 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          release_tag="klee-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA::7}"
+          release_tag="rodin-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA::7}"
           notes="$GITHUB_WORKSPACE/release-notes.md"
           cat > "$notes" <<EOF
-          Automated OrangeFox build for klee.
+          Automated OrangeFox build for rodin.
 
           - Device-tree commit: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}
           - OrangeFox branch: ${ORANGEFOX_BRANCH}
@@ -381,10 +381,10 @@ jobs:
           EOF
 
           gh release create "$release_tag" \
-            "release-artifacts/OrangeFox-R12.0-Unofficial-klee-system-compatible.img" \
-            "release-artifacts/OrangeFox-R12.0-Unofficial-klee-system-compatible.img.sha256" \
+            "release-artifacts/OrangeFox-R12.0-Unofficial-rodin-system-compatible.img" \
+            "release-artifacts/OrangeFox-R12.0-Unofficial-rodin-system-compatible.img.sha256" \
             --repo "$GH_REPO" \
             --target "$GITHUB_SHA" \
-            --title "OrangeFox klee CI ${GITHUB_SHA::7}" \
+            --title "OrangeFox rodin CI ${GITHUB_SHA::7}" \
             --notes-file "$notes" \
             --prerelease

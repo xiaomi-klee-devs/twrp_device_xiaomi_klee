@@ -10,27 +10,27 @@
 #   - patched DTB (tools/patch-vendor-boot-dtb.py drops USB offload nodes)
 #   - the freshly built recovery.cpio.lz4 as a RECOVERY ramdisk fragment
 # The result is AVB-signed and copied out as both
-#   OrangeFox-R12.0-Unofficial-klee-system-compatible.img  (flashable via OTA tools)
-#   OrangeFox-R12.0-Unofficial-klee.img (+ .md5)           (fastboot-friendly copy)
+#   OrangeFox-R12.0-Unofficial-rodin-system-compatible.img  (flashable via OTA tools)
+#   OrangeFox-R12.0-Unofficial-rodin.img (+ .md5)           (fastboot-friendly copy)
 # ============================================================================
 set -euo pipefail
 
 DEVICE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 TOP_DIR="$(cd -- "${DEVICE_DIR}/../../.." && pwd -P)"
-PRODUCT_OUT="${1:-${OUT_DIR:-${TOP_DIR}/out}/target/product/klee}"
+PRODUCT_OUT="${1:-${OUT_DIR:-${TOP_DIR}/out}/target/product/rodin}"
 
 STOCK_RAMDISK="${DEVICE_DIR}/prebuilt/stock_vendor_ramdisk.cpio.lz4"
-DEFAULT_OUTPUT_IMAGE="${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee-system-compatible.img"
+DEFAULT_OUTPUT_IMAGE="${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-rodin-system-compatible.img"
 OUTPUT_IMAGE="${2:-${DEFAULT_OUTPUT_IMAGE}}"
-STOCK_DTB="${DEVICE_DIR}/prebuilt/dtb/mt6899-klee.dtb"
+STOCK_DTB="${DEVICE_DIR}/prebuilt/dtb/mt6899-rodin.dtb"
 RECOVERY_LZ4="${PRODUCT_OUT}/obj/PACKAGING/vendor_ramdisk_fragments_intermediates/recovery.cpio.lz4"
-LZ4="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/lz4"
-MKBOOTIMG="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootimg"
-MKBOOTFS="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/mkbootfs"
-AVBTOOL="${PRODUCT_OUT%/target/product/klee}/host/linux-x86/bin/avbtool"
+LZ4="${PRODUCT_OUT%/target/product/rodin}/host/linux-x86/bin/lz4"
+MKBOOTIMG="${PRODUCT_OUT%/target/product/rodin}/host/linux-x86/bin/mkbootimg"
+MKBOOTFS="${PRODUCT_OUT%/target/product/rodin}/host/linux-x86/bin/mkbootfs"
+AVBTOOL="${PRODUCT_OUT%/target/product/rodin}/host/linux-x86/bin/avbtool"
 DTB_PATCHER="${DEVICE_DIR}/tools/patch-vendor-boot-dtb.py"
 
-work_dir="$(mktemp -d "${TMPDIR:-/tmp}/klee-vendor-boot.XXXXXX")"
+work_dir="$(mktemp -d "${TMPDIR:-/tmp}/rodin-vendor-boot.XXXXXX")"
 trap 'rm -rf "$work_dir"' EXIT
 
 recovery_cpio="${work_dir}/recovery.cpio"
@@ -39,7 +39,7 @@ platform_root="${work_dir}/platform-root"
 platform_pruned_cpio="${work_dir}/platform-pruned.cpio"
 platform_pruned_lz4="${work_dir}/platform-pruned.cpio.lz4"
 unsigned_image="${work_dir}/vendor_boot.img"
-patched_dtb="${work_dir}/mt6899-klee-no-usb-offload.dtb"
+patched_dtb="${work_dir}/mt6899-rodin-no-usb-offload.dtb"
 
 python3 "$DTB_PATCHER" --input "$STOCK_DTB" --output "$patched_dtb"
 "$LZ4" -d -f "$RECOVERY_LZ4" "$recovery_cpio" >/dev/null
@@ -108,9 +108,9 @@ mkdir -p "$(dirname "$OUTPUT_IMAGE")"
 mv -f "$unsigned_image" "$OUTPUT_IMAGE"
 
 cp -fp "$OUTPUT_IMAGE" "${PRODUCT_OUT}/vendor_boot.img"
-cp -fp "$OUTPUT_IMAGE" "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.img"
-md5sum "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.img" \
-    > "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.img.md5"
+cp -fp "$OUTPUT_IMAGE" "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-rodin.img"
+md5sum "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-rodin.img" \
+    > "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-rodin.img.md5"
 rm -f \
-    "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.zip" \
-    "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-klee.zip.md5"
+    "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-rodin.zip" \
+    "${PRODUCT_OUT}/OrangeFox-R12.0-Unofficial-rodin.zip.md5"

@@ -1,5 +1,5 @@
 # ============================================================================
-# Main device init rc (MT6899 / klee)
+# Main device init rc (MT6899 / rodin)
 # Imports the boot-control and keymint/TEE service definitions and sets up
 # early boot props, SELinux enforcing, USB controller and the loader
 # services started on `boot`.

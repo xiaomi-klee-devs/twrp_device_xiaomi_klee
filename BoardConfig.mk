@@ -1,8 +1,8 @@
 # ============================================================================
-# OrangeFox Recovery device tree - Xiaomi POCO X8 Pro / Redmi Turbo 5 (klee)
-# Platform: MediaTek Dimensity 8500-Ultra (MT6899), Android 16, A/B, virtual AB
+# OrangeFox Recovery device tree - Xiaomi POCO X7 Pro / Redmi Turbo 4 (rodin)
+# Platform: MediaTek Dimensity 8400-Ultra (MT6899), Android 16, A/B, virtual AB
 # ============================================================================
-DEVICE_PATH := device/xiaomi/klee
+DEVICE_PATH := device/xiaomi/rodin
 
 # ----------------------------------------------------------------------------
 # SELinux
@@ -37,7 +37,7 @@ TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a55
 # ----------------------------------------------------------------------------
 TARGET_BOARD_PLATFORM := mt6899
 TARGET_BOOTLOADER_BOARD_NAME := mt6899
-TARGET_OTA_ASSERT_DEVICE := klee
+TARGET_OTA_ASSERT_DEVICE := rodin
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_KERNEL := true
 TARGET_NO_RECOVERY := true
@@ -50,7 +50,7 @@ BOARD_USES_MTK_HARDWARE := true
 #     tell the build that kernel+recovery are delivered via vendor_boot.
 #   - BOARD_RAMDISK_USE_LZ4 : vendor_boot ramdisks must be LZ4-compressed.
 # ----------------------------------------------------------------------------
-TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb/mt6899-klee.dtb
+TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb/mt6899-rodin.dtb
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_ARCH := arm64
 BOARD_RAMDISK_USE_LZ4 := true
@@ -63,7 +63,7 @@ BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 # Touch controller kernel modules loaded from vendor_boot at boot time
 # (Novatek NT38771 panel touch + Xiaomi touch framework).
 TW_LOAD_VENDOR_BOOT_MODULES := true
-TW_LOAD_VENDOR_MODULES := "nt38771_touch_klee.ko xiaomi_touch_klee.ko"
+TW_LOAD_VENDOR_MODULES := "nt38771_touch_rodin.ko xiaomi_touch_rodin.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
 # ----------------------------------------------------------------------------
@@ -240,10 +240,10 @@ TW_USE_FSCRYPT_POLICY := 2
 
 # Extra libraries relinked into the recovery ramdisk:
 #   libtrusty               - Trusty TEE IPC (Keymaster/Weaver path)
-#   libklee_libcxx_compat   - local shim for libc++ verbose abort symbols
+#   librodin_libcxx_compat   - local shim for libc++ verbose abort symbols
 TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES = \
     $(TARGET_OUT_SHARED_LIBRARIES)/libtrusty.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libklee_libcxx_compat.so
+    $(TARGET_OUT_SHARED_LIBRARIES)/librodin_libcxx_compat.so
 
 # OrangeFox device flags (magiskboot, screen size, maintainer info)
--include $(DEVICE_PATH)/fox_klee.mk
+-include $(DEVICE_PATH)/fox_rodin.mk

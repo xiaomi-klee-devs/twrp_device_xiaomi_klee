@@ -5,7 +5,7 @@
 # Called once (with --first-call) right after the recovery ramdisk is
 # assembled. Slims the ramdisk so vendor_boot stays under 64 MiB:
 #   1. refresh libminuitwrp.so from the current build output
-#   2. keep only the touch/haptic/misc .ko modules klee actually needs
+#   2. keep only the touch/haptic/misc .ko modules rodin actually needs
 #   3. force MiSans font in all theme XMLs, drop unused fonts
 #   4. keep only the languages this build ships
 #   5. remove lpdump/snapshot daemons superseded by lptools
@@ -38,7 +38,7 @@ if [ -d "$ramdisk/lib/modules" ]; then
     find "$ramdisk/lib/modules" -maxdepth 1 -type f -name '*.ko' -print0 |
         while IFS= read -r -d '' module; do
             case "$(basename "$module")" in
-                nt38771_touch_klee.ko|xiaomi_touch_klee.ko|nxp_i2c.ko|p73.ko|spi-mt65xx.ko|irq-dbg.ko|haptic.ko|miev.ko|aac_haptic.ko)
+                nt38771_touch_rodin.ko|xiaomi_touch_rodin.ko|nxp_i2c.ko|p73.ko|spi-mt65xx.ko|irq-dbg.ko|haptic.ko|miev.ko|aac_haptic.ko)
                     ;;
                 *)
                     rm -f "$module"
@@ -101,7 +101,7 @@ upx_binaries=(
     e2fsdroid erase_image exfat-fuse fastbootd fatlabel flash_image fsck.exfat
     fsck.f2fs fsck.fat fscryptpolicyget grep keystore2 keystore_cli_v2 logcat
     logd lptools lzma make_f2fs minadbd mke2fs mkexfatfs mkfs.fat nano
-    ozip_decrypt pigz reboot recovery resetprop resize2fs klee_omapi_bridge
+    ozip_decrypt pigz reboot recovery resetprop resize2fs rodin_omapi_bridge
     sgdisk simg2img sload_f2fs tune2fs twrp update_engine_sideload vold_prepare_subdirs
     watchdogd ziptool android.hardware.boot@1.2-service
 )
