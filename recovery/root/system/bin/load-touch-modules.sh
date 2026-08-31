@@ -1,10 +1,11 @@
-#!/sbin/sh
+#!/system/bin/sh
 
 set +e
 
 mod_dir="/vendor_dlkm/lib/modules"
 modules=(
-    "nt38771_touch_rodin.ko"
+    "focaltech_touch_rodin.ko"
+    "goodix_core_rodin.ko"
     "xiaomi_touch_rodin.ko"
 )
 

@@ -63,7 +63,7 @@ capture_shell kernel.txt 'uname -a; cat /proc/version; cat /proc/cmdline'
 capture_shell modules.txt 'cat /proc/modules'
 capture_shell touch-modules.txt '
 cat /proc/modules | grep -E "goodix|focaltech|fts|xiaomi_touch|scp|tinysys" || true
-for module in nt38771_touch_rodin xiaomi_touch_rodin scp; do
+for module in goodix_core_rodin focaltech_touch_rodin xiaomi_touch_rodin scp; do
     if [ -d "/sys/module/$module" ]; then
         echo "loaded: $module"
     fi
@@ -96,7 +96,8 @@ for path in \
 done'
 capture_shell touch-files.txt '
 ls -l /lib/modules/*goodix* /lib/modules/*focal* /lib/modules/*touch* 2>/dev/null
-sha256sum /lib/modules/nt38771_touch_rodin.ko \
+sha256sum /lib/modules/goodix_core_rodin.ko \
+    /lib/modules/focaltech_touch_rodin.ko \
     /lib/modules/xiaomi_touch_rodin.ko 2>/dev/null || true'
 capture_shell block-layout.txt '
 slot="$(getprop ro.boot.slot_suffix)"

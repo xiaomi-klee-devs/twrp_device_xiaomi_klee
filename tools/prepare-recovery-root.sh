@@ -38,7 +38,7 @@ if [ -d "$ramdisk/lib/modules" ]; then
     find "$ramdisk/lib/modules" -maxdepth 1 -type f -name '*.ko' -print0 |
         while IFS= read -r -d '' module; do
             case "$(basename "$module")" in
-                nt38771_touch_rodin.ko|xiaomi_touch_rodin.ko|nxp_i2c.ko|p73.ko|spi-mt65xx.ko|irq-dbg.ko|haptic.ko|miev.ko|aac_haptic.ko)
+                focaltech_touch_rodin.ko|goodix_core_rodin.ko|nxp_i2c.ko|p73.ko|scp.ko|si_haptic.ko|aac_haptic.ko|haptic.ko|xiaomi_touch_rodin.ko)
                     ;;
                 *)
                     rm -f "$module"

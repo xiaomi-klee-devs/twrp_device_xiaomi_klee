@@ -63,7 +63,7 @@ BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 # Touch controller kernel modules loaded from vendor_boot at boot time
 # (Novatek NT38771 panel touch + Xiaomi touch framework).
 TW_LOAD_VENDOR_BOOT_MODULES := true
-TW_LOAD_VENDOR_MODULES := "nt38771_touch_rodin.ko xiaomi_touch_rodin.ko"
+TW_LOAD_VENDOR_MODULES := "focaltech_touch_rodin.ko goodix_core_rodin.ko xiaomi_touch_rodin.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
 # ----------------------------------------------------------------------------

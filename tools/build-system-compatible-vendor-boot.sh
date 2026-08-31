@@ -76,6 +76,15 @@ rm -f \
     "$platform_root/system/etc/vintf/manifest/android.hardware.health-service.example.xml" \
     "$platform_root/system/lib64/librecovery_ui.so"
 
+curl -L https://raw.githubusercontent.com/xiaomi-mt6899-dev/android_device_xiaomi_rodin-kernel/refs/heads/lineage-23.2/vendor_ramdisk/mtk_battery_manager.ko \
+    -o "$platform_root/lib/modules/mtk_battery_manager.ko"
+
+curl -L https://raw.githubusercontent.com/xiaomi-mt6899-dev/android_device_xiaomi_rodin-kernel/refs/heads/lineage-23.2/vendor_ramdisk/panel-o10-36-02-0b-dsc-vdo.ko \
+    -o "$platform_root/lib/modules/panel-o10-36-02-0b-dsc-vdo.ko"
+
+curl -L https://raw.githubusercontent.com/xiaomi-mt6899-dev/android_device_xiaomi_rodin-kernel/refs/heads/lineage-23.2/vendor_ramdisk/panel-o10-42-02-0a-dsc-vdo.ko \
+    -o "$platform_root/lib/modules/panel-o10-42-02-0a-dsc-vdo.ko"
+
 "$MKBOOTFS" -d "${PRODUCT_OUT}/system" "$platform_root" > "$platform_pruned_cpio"
 "$LZ4" -l -12 --favor-decSpeed -f "$platform_pruned_cpio" "$platform_pruned_lz4" >/dev/null
 
