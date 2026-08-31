@@ -28,21 +28,15 @@
         </uids>
         <uuid>9f36407ead0639fc966f14dde7970f68</uuid>
     </uuid_ref_do>
+
+    <!-- Sample mapping entry with UIDs:1096 and 1097 mapped to -->
     <!-- UUID:9f36407ead0639fc966f14dde7970f68 -->
-    <!-- NXP strongbox hal && weaver hal uids mapped to -->
     <uuid_ref_do>
         <uids>
             <uid>2901</uid>
             <uid>2902</uid>
+            <uid>2903</uid>
         </uids>
         <uuid>636F6D2E6E78702E7365637572697479</uuid>
-    </uuid_ref_do>
-    <!-- TMS strongbox hal && weaver hal uids mapped to -->
-    <uuid_ref_do>
-        <uids>
-            <uid>1087</uid>
-            <uid>1088</uid>
-        </uids>
-        <uuid>776b5210881f5c592e8bf92dca3b1033</uuid>
     </uuid_ref_do>
 </ref_do>

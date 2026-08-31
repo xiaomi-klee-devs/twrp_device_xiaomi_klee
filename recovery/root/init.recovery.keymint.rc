@@ -48,34 +48,12 @@ service rodin.omapi_bridge /system/bin/rodin_omapi_bridge
     seclabel u:r:recovery:s0
     disabled
 
-service miweaver_hal_service /vendor/bin/hw/vendor.xiaomi.hardware.authsecretd
-    class hal
-    user system
-    group system drmrpc
-    oneshot
-    disabled
-    interface aidl vendor.xiaomi.hardware.miauthsecretd.IMIAuthSecret/default
-    interface aidl vendor.xiaomi.hardware.miauthsecretd.ICpaceService/default
-    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
-    setenv LD_PRELOAD /system/lib64/libc++_hos.so
-    seclabel u:r:recovery:s0
-
 service vendor.weaver_nxp /vendor/bin/hw/android.hardware.weaver-service.nxp
     class hal
     user 2902
     group system drmrpc
     capabilities WAKE_ALARM
     setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
-    setenv LD_PRELOAD /system/lib64/libc++_hos.so
-    seclabel u:r:recovery:s0
-    disabled
-
-service vendor.weaver_xiaomi /vendor/bin/hw/android.hardware.weaver
-    class hal
-    user system
-    group system drmrpc secure_element nfc
-    capabilities WAKE_ALARM
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
     setenv LD_PRELOAD /system/lib64/libc++_hos.so
     seclabel u:r:recovery:s0
     disabled
