@@ -100,7 +100,7 @@ index 42e30797..aa568b97 100755
      {
        PartitionManager.UnMount_By_Path(arg, true);
 diff --git a/gui/gui.cpp b/gui/gui.cpp
-index 71bbc967..4291f2aa 100644
+index 71bbc967..e485f13a 100644
 --- a/gui/gui.cpp
 +++ b/gui/gui.cpp
 @@ -122,6 +122,7 @@ public:
@@ -248,6 +248,106 @@ index 71bbc967..4291f2aa 100644
  		key_status = KS_NONE;
  		touch_status = TS_NONE;
  #ifdef TW_USE_KEY_CODE_TOUCH_SYNC
+@@ -715,6 +758,17 @@ static int runPages(const char *page_name, const int stop_on_page_done)
+ 				ors_command_read();
+ 		}
+ 
++		static timespec lastFlip = {0, 0};
++		static bool lastFlipInitialized = false;
++		const time_t kKeepaliveSec = 4; // safely under the 10s underrun watchdog
++		bool didFlip = false;
++
++		if (!lastFlipInitialized)
++		{
++			clock_gettime(CLOCK_MONOTONIC, &lastFlip);
++			lastFlipInitialized = true;
++		}
++
+ 		if (!gForceRender.get_value())
+ 		{
+ 			int ret = PageManager::Update();
+@@ -732,7 +786,10 @@ static int runPages(const char *page_name, const int stop_on_page_done)
+ 				PageManager::Render();
+ 
+ 			if (ret > 0)
++			{
+ 				flip();
++				didFlip = true;
++			}
+ #else
+ 			if (ret > 1)
+ 			{
+@@ -744,23 +801,44 @@ static int runPages(const char *page_name, const int stop_on_page_done)
+ 				render_t = TWFunc::timespec_diff_ms(start, end);
+ 
+ 				flip();
++				didFlip = true;
+ 				clock_gettime(CLOCK_MONOTONIC, &start);
+ 				flip_t = TWFunc::timespec_diff_ms(end, start);
+ 
+ 				LOGINFO("Render(): %u ms, flip(): %u ms, total: %u ms\n", render_t, flip_t, render_t+flip_t);
+ 			}
+ 			else if (ret > 0)
++			{
+ 				flip();
++				didFlip = true;
++			}
+ #endif
++
++			if (!didFlip && !blankTimer.isScreenOff())
++			{
++				timespec now;
++				clock_gettime(CLOCK_MONOTONIC, &now);
++				timespec sinceFlip = TWFunc::timespec_diff(lastFlip, now);
++				if (sinceFlip.tv_sec >= kKeepaliveSec)
++				{
++					PageManager::Render();
++					flip();
++					didFlip = true;
++				}
++			}
+ 		}
+ 		else
+ 		{
+ 			gForceRender.set_value(0);
+ 			PageManager::Render();
+ 			flip();
++			didFlip = true;
+ 			input_timeout_ms = 0;
+ 		}
+ 
++		if (didFlip)
++			clock_gettime(CLOCK_MONOTONIC, &lastFlip);
++
+ 		blankTimer.checkForTimeout();
+ 		if (stop_on_page_done && DataManager::GetIntValue("tw_page_done") != 0)
+ 		{
+diff --git a/gui/pages.cpp b/gui/pages.cpp
+index b1825757..81cc396c 100755
+--- a/gui/pages.cpp
++++ b/gui/pages.cpp
+@@ -762,6 +762,21 @@ int PageSet::Load(LoadingContext& ctx, const std::string& filename)
+ 		// ignore already loaded files to prevent crash with cyclic includes
+ 		return 0;
+ 
++	{
++		static timespec lastLoadFlip = {0, 0};
++		static bool lastLoadFlipInit = false;
++		const time_t kLoadKeepaliveSec = 4; // safely under the 10s underrun watchdog
++		timespec now;
++		clock_gettime(CLOCK_MONOTONIC, &now);
++		if (!lastLoadFlipInit) {
++			lastLoadFlip = now;
++			lastLoadFlipInit = true;
++		} else if (now.tv_sec - lastLoadFlip.tv_sec >= kLoadKeepaliveSec) {
++			gr_flip();
++			lastLoadFlip = now;
++		}
++	}
++
+ 	// load XML into buffer
+ 	char* xmlbuffer = PageManager::LoadFileToBuffer(filename, ctx.zip);
+ 	if (!xmlbuffer)
 diff --git a/gui/theme/common/languages/ja_JP.xml b/gui/theme/common/languages/ja_JP.xml
 index 40d7d6e6..fc62815f 100644
 --- a/gui/theme/common/languages/ja_JP.xml
@@ -1188,6 +1288,103 @@ index 8e22b640..97a85fd9 100644
  }
  
  void gr_clip(int x, int y, int w, int h)
+diff --git a/minuitwrp/graphics_drm.cpp b/minuitwrp/graphics_drm.cpp
+index 0cc80f5c..32fe96f6 100644
+--- a/minuitwrp/graphics_drm.cpp
++++ b/minuitwrp/graphics_drm.cpp
+@@ -240,6 +240,8 @@ static uint32_t number_of_lms = DEFAULT_NUM_LMS;
+ static uint32_t spr_enabled;
+ static std::string spr_prop_name;
+ 
++static bool page_flip_pending = false;
++
+ #define find_prop_id(_res, type, Type, obj_id, prop_name, prop_id)    \
+   do {                                                                \
+     int j = 0;                                                        \
+@@ -610,6 +612,10 @@ static void drm_blank(minui_backend* backend __unused, bool blank) {
+     ret = drmModeAtomicCommit(drm_fd, atomic_req, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
+ 
+   if (!ret) {
++    /* Disabling the CRTC stops vblank; a pending page-flip event may never
++     * be delivered, so drop the pending flag to avoid stalling the next flip.
++     */
++    page_flip_pending = false;
+     printf("Atomic Commit succeed");
+     current_blank_state = blank;
+   } else {
+@@ -898,6 +904,39 @@ static void disable_non_main_crtcs(int fd,
+   drmModeAtomicFree(atomic_req);
+ }
+ 
++static void page_flip_handler(int fd __unused, unsigned int sequence __unused,
++                               unsigned int tv_sec __unused, unsigned int tv_usec __unused,
++                               void *user_data __unused) {
++  page_flip_pending = false;
++}
++
++static void wait_for_page_flip(void) {
++  if (!page_flip_pending)
++    return;
++
++  drmEventContext ev;
++  memset(&ev, 0, sizeof(ev));
++  ev.version = DRM_EVENT_CONTEXT_VERSION;
++  ev.page_flip_handler = page_flip_handler;
++
++  while (page_flip_pending) {
++    struct pollfd pfd;
++    pfd.fd = drm_fd;
++    pfd.events = POLLIN;
++    pfd.revents = 0;
++    int ret = poll(&pfd, 1, 5000);
++    if (ret > 0 && (pfd.revents & POLLIN))
++      drmHandleEvent(drm_fd, &ev);
++    else {
++      /* Timeout or error: don't block forever if the driver never
++       * delivers a page-flip event. Just clear the flag and continue.
++       */
++      page_flip_pending = false;
++      break;
++    }
++  }
++}
++
+ static void update_plane_fb() {
+   uint32_t i, prop_id;
+ 
+@@ -919,15 +958,21 @@ static void update_plane_fb() {
+     drmModeAtomicAddProperty(atomic_req, plane_res[i].plane->plane_id,
+                              fb_prop_id, drm_surfaces[current_buffer]->fb_id);
+ 
+-  /* Commit changes */
++  /* Commit changes — request a page-flip event so the next flip can wait
++   * for the hardware to finish scanning out the buffer being replaced.
++   */
+   int32_t ret;
+   ret = drmModeAtomicCommit(drm_fd, atomic_req,
+-                 DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
++                 DRM_MODE_ATOMIC_ALLOW_MODESET | DRM_MODE_PAGE_FLIP_EVENT, NULL);
+ 
+   drmModeAtomicFree(atomic_req);
+ 
+-  if (ret)
++  if (ret) {
+     printf("Atomic commit failed ret=%d\n", ret);
++    page_flip_pending = false;
++  } else {
++    page_flip_pending = true;
++  }
+ 
+ }
+ 
+@@ -1147,6 +1192,7 @@ static GRSurface* drm_init(minui_backend* backend __unused) {
+ }
+ 
+ static GRSurface* drm_flip(minui_backend* backend __unused) {
++    wait_for_page_flip();
+     memcpy(drm_surfaces[current_buffer]->base.data,
+             draw_buf->data, draw_buf->height * draw_buf->row_bytes);
+     update_plane_fb();
 diff --git a/minuitwrp/include/minuitwrp/truetype.hpp b/minuitwrp/include/minuitwrp/truetype.hpp
 index 72b7620a..f096a230 100755
 --- a/minuitwrp/include/minuitwrp/truetype.hpp
