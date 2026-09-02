@@ -12,7 +12,7 @@ on:
           - self-hosted
           - ubuntu-24.04
       publish:
-        description: Create a prerelease with vendor_boot images
+        description: 'Create a prerelease with vendor_boot'
         required: true
         default: true
         type: boolean
@@ -29,60 +29,45 @@ on:
       run_remove_worktree:
         description: 'Step: Remove stale build worktree'
         required: false
-        default: true
+        default: false
         type: boolean
       run_free_disk:
         description: 'Step: Free disk space'
         required: false
-        default: true
+        default: false
         type: boolean
       run_set_swap:
         description: 'Step: Set swap space'
         required: false
-        default: true
+        default: false
         type: boolean
       run_packages:
         description: 'Step: Install host packages'
         required: false
-        default: true
+        default: false
         type: boolean
       run_setup_swap:
         description: 'Step: Setup build swap'
         required: false
-        default: true
+        default: false
         type: boolean
       run_capacity:
         description: 'Step: Check runner capacity'
         required: false
-        default: true
+        default: false
         type: boolean
       run_repo_tool:
         description: 'Step: Install repo tool'
         required: false
-        default: true
+        default: false
         type: boolean
       run_sync:
         description: 'Step: Sync OrangeFox sources'
         required: false
         default: true
         type: boolean
-      run_setup_patches:
-        description: 'Step: Apply OrangeFox setup patches'
-        required: false
-        default: true
-        type: boolean
       run_install_devicetree:
         description: 'Step: Install klee device tree'
-        required: false
-        default: true
-        type: boolean
-      run_apply_patches:
-        description: 'Step: Apply source patches & verify'
-        required: false
-        default: true
-        type: boolean
-      run_drop_sync:
-        description: 'Step: Drop sync metadata'
         required: false
         default: true
         type: boolean
@@ -109,7 +94,7 @@ on:
       run_clean:
         description: 'Step: Clean build worktree'
         required: false
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -121,8 +106,8 @@ concurrency:
 
 env:
   ORANGEFOX_BRANCH: '14.1'
-  ORANGEFOX_SYNC_REVISION: '11e4406b2bd1de939a26b6bfbad7e371cc3b1fa7'
   ORANGEFOX_TOP: ${{ github.workspace }}/OrangeFox
+  ORANGEFOX_SYNC: ${{ github.workspace }}/sync
   OF_BUILD_JOBS: '1'
 
 jobs:
@@ -156,8 +141,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf "$ORANGEFOX_TOP" \
-            "$GITHUB_WORKSPACE/ofox-sync" \
-            "$GITHUB_WORKSPACE/pinned-manifest" \
+            "$GITHUB_WORKSPACE/sync" \
             "$GITHUB_WORKSPACE/artifacts"
           rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
             "$GITHUB_WORKSPACE/orangefox-build.log"
@@ -243,55 +227,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          manifest_repo="$GITHUB_WORKSPACE/pinned-manifest"
-          export GIT_CONFIG_GLOBAL="$GITHUB_WORKSPACE/ci-gitconfig"
-          mkdir -p "$manifest_repo"
-          cp "$GITHUB_WORKSPACE/device-tree/manifests/orangefox-fox_14.1-pinned.xml" \
-            "$manifest_repo/default.xml"
-          git -C "$manifest_repo" init --initial-branch=main --quiet
-          git -C "$manifest_repo" config user.name "OrangeFox CI"
-          git -C "$manifest_repo" config user.email "orangefox-ci@localhost"
-          git -C "$manifest_repo" add default.xml
-          git -C "$manifest_repo" commit --quiet -m "Pinned OrangeFox 14.1 manifest"
           git config --global protocol.file.allow always
           git config --global http.lowSpeedLimit 1
           git config --global http.lowSpeedTime 600
 
           mkdir -p "$ORANGEFOX_TOP"
-          cd "$ORANGEFOX_TOP"
-          repo init --depth=1 \
-            -u "file://${manifest_repo}" \
-            -b main \
-            -m default.xml
+          git clone https://github.com/xiaomi-klee-devs/android_sync.git \
+            "$ORANGEFOX_SYNC"
 
-          repo sync -c -j4 --retry-fetches=3 \
-            --no-clone-bundle --no-tags --optimized-fetch
-
-      - name: Apply OrangeFox setup patches
-        if: ${{ inputs.run_setup_patches != false }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          sync_dir="$GITHUB_WORKSPACE/ofox-sync"
-          git clone --filter=blob:none https://gitlab.com/OrangeFox/sync.git "$sync_dir"
-          git -C "$sync_dir" checkout --detach "$ORANGEFOX_SYNC_REVISION"
-          test "$(git -C "$sync_dir" rev-parse HEAD)" = "$ORANGEFOX_SYNC_REVISION"
-
-          vold_patch="$sync_dir/patches/patch-vold-fox_14.1.diff"
-          test "$(sha256sum "$vold_patch" | awk '{print $1}')" = \
-            "29b4b0b387c3185a3dcc69f141a3c84969510547d13ed2de71eefa8423c57778"
-          if git -C "$ORANGEFOX_TOP/system/vold" apply --reverse --check "$vold_patch" 2>/dev/null; then
-            echo "OrangeFox system/vold patch is already applied"
-          else
-            git -C "$ORANGEFOX_TOP/system/vold" apply --check "$vold_patch"
-            git -C "$ORANGEFOX_TOP/system/vold" apply "$vold_patch"
-          fi
-
-          boardconfig="$ORANGEFOX_TOP/vendor/twrp/config/BoardConfigSoong.mk"
-          grep -qx 'include bootable/recovery/orangefox_soong.mk' "$boardconfig" || \
-            sed -i '/SOONG_CONFIG_NAMESPACES += twrpVarsPlugin/i include bootable/recovery/orangefox_soong.mk' \
-              "$boardconfig"
+          cd "$ORANGEFOX_SYNC"
+          ./orangefox_sync.sh --branch 14.1 --path "$ORANGEFOX_TOP"
 
       - name: Install klee device tree
         if: ${{ inputs.run_install_devicetree != false }}
@@ -304,26 +249,6 @@ jobs:
             --exclude images \
             "$GITHUB_WORKSPACE/device-tree/" \
             "$ORANGEFOX_TOP/device/xiaomi/klee/"
-
-      - name: Apply source patches & verify
-        if: ${{ inputs.run_apply_patches != false }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          "$ORANGEFOX_TOP/device/xiaomi/klee/tools/apply-orangefox-patches.sh" \
-            "$ORANGEFOX_TOP"
-
-      - name: Drop sync metadata
-        if: ${{ inputs.run_drop_sync != false }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf "$ORANGEFOX_TOP/.repo" \
-            "$GITHUB_WORKSPACE/ofox-sync" \
-            "$GITHUB_WORKSPACE/pinned-manifest" \
-            "$GITHUB_WORKSPACE/ci-gitconfig"
-          df -h "$GITHUB_WORKSPACE"
-          free -h
 
       - name: Build vendor_boot image
         if: ${{ inputs.run_build_vendorboot != false }}
@@ -405,14 +330,13 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf "$ORANGEFOX_TOP" \
-            "$GITHUB_WORKSPACE/ofox-sync" \
-            "$GITHUB_WORKSPACE/pinned-manifest" \
+            "$GITHUB_WORKSPACE/sync" \
             "$GITHUB_WORKSPACE/artifacts"
           rm -f "$GITHUB_WORKSPACE/ci-gitconfig" \
             "$GITHUB_WORKSPACE/orangefox-build.log"
 
   release:
-    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+    if: ${{ needs.build.result == 'success' && github.ref == 'refs/heads/klee' && (github.event_name == 'workflow_dispatch' && inputs.publish) }}
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 30

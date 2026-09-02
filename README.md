@@ -45,7 +45,6 @@ Camera  | 50MP wide camera, 8MP ultra wide-angle camera, 20MP front camera
 | Script | Purpose |
 |--------|---------|
 | `tools/compile.sh` | Build entry point (low-RAM profile by default); logs to `out/logs/` |
-| `tools/apply-orangefox-patches.sh` | Applies `patches/*.patch` onto build/make, bootable/recovery, system/core |
 | `tools/build-system-compatible-vendor-boot.sh` | Repacks the final system-compatible vendor_boot image |
 | `tools/verify-build-inputs.sh` | Preflight: pinned-manifest check + script syntax checks |
 | `tools/verify-source-manifest.py` | Compares the synced tree against the pinned manifest |

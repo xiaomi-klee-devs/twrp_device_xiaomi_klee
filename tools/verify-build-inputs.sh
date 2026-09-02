@@ -31,7 +31,6 @@ fi
 for script in \
     "${DEVICE_DIR}/tools/compile.sh" \
     "${DEVICE_DIR}/tools/prepare-recovery-root.sh" \
-    "${DEVICE_DIR}/tools/apply-orangefox-patches.sh" \
     "${DEVICE_DIR}/tools/build-system-compatible-vendor-boot.sh" \
     "${DEVICE_DIR}/tools/collect-compat-report.sh" \
     "${DEVICE_DIR}/tools/verify-build-inputs.sh"; do
