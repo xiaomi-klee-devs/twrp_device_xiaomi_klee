@@ -1,4 +1,4 @@
-on boot
+on init
     start touch_report
 
 service touch_report /vendor/bin/touch_report
