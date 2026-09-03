@@ -141,7 +141,7 @@ TARGET_USERIMAGES_USE_EROFS := true
 # - IMAGE_PREPARE    : post-build hook that slims/prunes/UPX-packs the ramdisk
 # ----------------------------------------------------------------------------
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
-TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
 TARGET_USES_LOGD := true
 BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_HAS_NO_SELECT_BUTTON := true
