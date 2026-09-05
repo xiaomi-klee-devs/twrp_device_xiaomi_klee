@@ -1,0 +1,13 @@
+# ----------------------------------------------------------------------------
+# klee_kernel.te - kernel domain bring-up permissive
+#
+# dmesg/logcat show a repeating permissive=0 denial:
+#   avc: denied { search } for name="block" dev="tmpfs" ino=12
+#   scontext=u:r:kernel:s0 tcontext=u:object_r:block_device:s0 tclass=dir
+# comm=block2mtd_retry retries every ~2s and never succeeds, stalling the
+# block2mtd lookup during recovery boot. Set permissive for now; replace
+# with an explicit `allow kernel block_device:dir search;` once the rest
+# of the block2mtd access chain (read/open/getattr) has been audited.
+# ----------------------------------------------------------------------------
+
+permissive kernel;
