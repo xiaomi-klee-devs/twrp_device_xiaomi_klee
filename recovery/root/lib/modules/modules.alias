@@ -1,4 +1,8 @@
 # Aliases extracted from modules themselves.
+alias of:N*T*Cxiaomi,touch-spi focaltech_touch_rodin
+alias of:N*T*Cxiaomi,touch-spiC* focaltech_touch_rodin
+alias of:N*T*Cnt37801,cmd,120hz panel_nt37801_cmd_120hz
+alias of:N*T*Cnt37801,cmd,120hzC* panel_nt37801_cmd_120hz
 alias of:N*T*Cmediatek,mt6359p-keys mtk_pmic_keys
 alias of:N*T*Cmediatek,mt6359p-keysC* mtk_pmic_keys
 alias of:N*T*Cmediatek,mt6397-keys mtk_pmic_keys
@@ -22,8 +26,8 @@ alias of:N*T*Cmediatek,mt6765-pwrap mtk_pmic_wrap
 alias of:N*T*Cmediatek,mt6765-pwrapC* mtk_pmic_wrap
 alias of:N*T*Cmediatek,mt6768-pwrap mtk_pmic_wrap
 alias of:N*T*Cmediatek,mt6768-pwrapC* mtk_pmic_wrap
-alias of:N*T*Cmediatek,mt6771-pwrap mtk_pmic_wrap
-alias of:N*T*Cmediatek,mt6771-pwrapC* mtk_pmic_wrap
+alias of:N*T*Cmediatek,pwrap mtk_pmic_wrap
+alias of:N*T*Cmediatek,pwrapC* mtk_pmic_wrap
 alias of:N*T*Cmediatek,mt6779-pwrap mtk_pmic_wrap
 alias of:N*T*Cmediatek,mt6779-pwrapC* mtk_pmic_wrap
 alias of:N*T*Cmediatek,mt6789-pwrap mtk_pmic_wrap
@@ -116,10 +120,6 @@ alias of:N*T*Cmediatek,mt6877-i2c i2c_mt65xx
 alias of:N*T*Cmediatek,mt6877-i2cC* i2c_mt65xx
 alias of:N*T*Cmediatek,mt6765-i2c i2c_mt65xx
 alias of:N*T*Cmediatek,mt6765-i2cC* i2c_mt65xx
-alias of:N*T*Cmediatek,mt6771-i2c i2c_mt65xx
-alias of:N*T*Cmediatek,mt6771-i2cC* i2c_mt65xx
-alias of:N*T*Cmediatek,spmi-pmic-debug mtk_spmi_pmic_debug
-alias of:N*T*Cmediatek,spmi-pmic-debugC* mtk_spmi_pmic_debug
 alias of:N*T*Cmediatek,mt6357-battery_oc_throttling mtk_battery_oc_throttling
 alias of:N*T*Cmediatek,mt6357-battery_oc_throttlingC* mtk_battery_oc_throttling
 alias of:N*T*Cmediatek,mt6358-battery_oc_throttling mtk_battery_oc_throttling
@@ -140,10 +140,6 @@ alias of:N*T*Cmediatek,mt8173-mtu3 mtu3
 alias of:N*T*Cmediatek,mt8173-mtu3C* mtu3
 alias of:N*T*Cmediatek,mtu3 mtu3
 alias of:N*T*Cmediatek,mtu3C* mtu3
-alias spi:p61 p73
-alias spi:p61 p73
-alias of:N*T*Cp10_42_02_0b_dsc_vdo,lcm panel_p10_42_02_0b_dsc_vdo
-alias of:N*T*Cp10_42_02_0b_dsc_vdo,lcmC* panel_p10_42_02_0b_dsc_vdo
 alias of:N*T*Cti,syscon-reset reset_ti_syscon
 alias of:N*T*Cti,syscon-resetC* reset_ti_syscon
 alias of:N*T*Cmediatek,mt6853-pmif-m spmi_mtk_pmif
@@ -176,6 +172,10 @@ alias of:N*T*Cmediatek,mt6989-spmi spmi_mtk_pmif
 alias of:N*T*Cmediatek,mt6989-spmiC* spmi_mtk_pmif
 alias of:N*T*Cmediatek,mt6991-spmi spmi_mtk_pmif
 alias of:N*T*Cmediatek,mt6991-spmiC* spmi_mtk_pmif
+alias of:N*T*Co10_36_02_0b_dsc_vdo,lcm panel_o10_36_02_0b_dsc_vdo
+alias of:N*T*Co10_36_02_0b_dsc_vdo,lcmC* panel_o10_36_02_0b_dsc_vdo
+alias of:N*T*Ctruly,nt35595,cmd panel_truly_nt35595_cmd
+alias of:N*T*Ctruly,nt35595,cmdC* panel_truly_nt35595_cmd
 alias of:N*T*Cmediatek,mtk_ctd mtk_chg_type_det
 alias of:N*T*Cmediatek,mtk_ctdC* mtk_chg_type_det
 alias of:N*T*Cmediatek,mt8192-pcie pcie_mediatek_gen3
@@ -188,8 +188,6 @@ alias of:N*T*Cmediatek,mt6991-pcie pcie_mediatek_gen3
 alias of:N*T*Cmediatek,mt6991-pcieC* pcie_mediatek_gen3
 alias of:N*T*Cmediatek,charger,pe2 mtk_pep20
 alias of:N*T*Cmediatek,charger,pe2C* mtk_pep20
-alias of:N*T*Cmediatek,mtk-bp-thl mtk_bp_thl
-alias of:N*T*Cmediatek,mtk-bp-thlC* mtk_bp_thl
 alias of:N*T*Cmediatek,mt6681_pmic mt6681_core
 alias of:N*T*Cmediatek,mt6681_pmicC* mt6681_core
 alias i2c:mt6681_pmic mt6681_core
@@ -221,8 +219,6 @@ alias of:N*T*Cmediatek,mt6781-disp-pwm pwm_mtk_disp
 alias of:N*T*Cmediatek,mt6781-disp-pwmC* pwm_mtk_disp
 alias of:N*T*Cmediatek,mt6991-disp-pwm0 pwm_mtk_disp
 alias of:N*T*Cmediatek,mt6991-disp-pwm0C* pwm_mtk_disp
-alias of:N*T*Cmediatek,mt6885-disp-pwm pwm_mtk_disp
-alias of:N*T*Cmediatek,mt6885-disp-pwmC* pwm_mtk_disp
 alias of:N*T*Cmediatek,mt6685-rtc rtc_mt6685
 alias of:N*T*Cmediatek,mt6685-rtcC* rtc_mt6685
 alias of:N*T*Cmediatek,mt6357-dynamic_loading_throttling mtk_dynamic_loading_throttling
@@ -235,8 +231,6 @@ alias of:N*T*Cmediatek,mt6363-dynamic_loading_throttling mtk_dynamic_loading_thr
 alias of:N*T*Cmediatek,mt6363-dynamic_loading_throttlingC* mtk_dynamic_loading_throttling
 alias of:N*T*Cmediatek,mt6377-dynamic_loading_throttling mtk_dynamic_loading_throttling
 alias of:N*T*Cmediatek,mt6377-dynamic_loading_throttlingC* mtk_dynamic_loading_throttling
-alias of:N*T*Cp10_36_02_0a_dsc_vdo,lcm panel_p10_36_02_0a_dsc_vdo
-alias of:N*T*Cp10_36_02_0a_dsc_vdo,lcmC* panel_p10_36_02_0a_dsc_vdo
 alias of:N*T*Cmediatek,mt6315_3-regulator mt6315_regulator
 alias of:N*T*Cmediatek,mt6315_3-regulatorC* mt6315_regulator
 alias of:N*T*Cmediatek,mt6315_6-regulator mt6315_regulator
@@ -295,13 +289,14 @@ alias of:N*T*Cmediatek,mt6781-dvfsrc mtk_dvfsrc_regulator
 alias of:N*T*Cmediatek,mt6781-dvfsrcC* mtk_dvfsrc_regulator
 alias of:N*T*Cmediatek,mt6899-dvfsrc mtk_dvfsrc_regulator
 alias of:N*T*Cmediatek,mt6899-dvfsrcC* mtk_dvfsrc_regulator
+alias of:N*T*Cjdi,nt36672e,vdo,60hz panel_alpha_jdi_nt36672e_vdo_60hz
+alias of:N*T*Cjdi,nt36672e,vdo,60hzC* panel_alpha_jdi_nt36672e_vdo_60hz
 alias of:N*T*Cmediatek,mt6375-adc mt6375_adc
 alias of:N*T*Cmediatek,mt6375-adcC* mt6375_adc
-alias of:N*T*Cdio,dio8015 dio8015
-alias of:N*T*Cdio,dio8015C* dio8015
-alias of:N*T*Cwillsemi,wl2866d dio8015
-alias of:N*T*Cwillsemi,wl2866dC* dio8015
-alias i2c:dio8015-regulator dio8015
+alias of:N*T*Cjdi,nt36672e,vdo,120hz,threshold panel_alpha_jdi_nt36672e_vdo_120hz_threshold
+alias of:N*T*Cjdi,nt36672e,vdo,120hz,thresholdC* panel_alpha_jdi_nt36672e_vdo_120hz_threshold
+alias of:N*T*Cjdi,nt36672e,vdo,120hz panel_alpha_jdi_nt36672e_vdo_120hz
+alias of:N*T*Cjdi,nt36672e,vdo,120hzC* panel_alpha_jdi_nt36672e_vdo_120hz
 alias of:N*T*Cmediatek,extcon-usb extcon_mtk_usb
 alias of:N*T*Cmediatek,extcon-usbC* extcon_mtk_usb
 alias of:N*T*Cmediatek,common-emislb emi_slb
@@ -341,6 +336,9 @@ alias of:N*T*Cmediatek,mt6989-vdisp-ctrl-v1 mtk_vdisp_v1
 alias of:N*T*Cmediatek,mt6989-vdisp-ctrl-v1C* mtk_vdisp_v1
 alias of:N*T*Cmediatek,mt6899-vdisp-ctrl-v1 mtk_vdisp_v1
 alias of:N*T*Cmediatek,mt6899-vdisp-ctrl-v1C* mtk_vdisp_v1
+alias i2c:ti,bq25985 bq25985_charger
+alias of:N*T*Cti,bq25985 bq25985_charger
+alias of:N*T*Cti,bq25985C* bq25985_charger
 alias of:N*T*Cmediatek,mt6375-gauge mt6375_battery
 alias of:N*T*Cmediatek,mt6375-gaugeC* mt6375_battery
 alias platform:mt6368-regulator mt6368_regulator
@@ -358,8 +356,6 @@ alias of:N*T*Cmediatek,mtk-leds leds_mtk_disp
 alias of:N*T*Cmediatek,mtk-ledsC* leds_mtk_disp
 alias of:N*T*Cmediatek,charger mtk_charger_framework
 alias of:N*T*Cmediatek,chargerC* mtk_charger_framework
-alias of:N*T*Cmdm,mi_t1_chip mi_t1_gpio
-alias of:N*T*Cmdm,mi_t1_chipC* mi_t1_gpio
 alias of:N*T*Cmediatek,smmu-share-group mm_fake_engine
 alias of:N*T*Cmediatek,smmu-share-groupC* mm_fake_engine
 alias of:N*T*Cmediatek,mt2712-wdt mtk_wdt
@@ -382,11 +378,6 @@ alias of:N*T*Cmediatek,mt6377-auxadc mtk_spmi_pmic_adc
 alias of:N*T*Cmediatek,mt6377-auxadcC* mtk_spmi_pmic_adc
 alias of:N*T*Csyscon-reboot-mode syscon_reboot_mode
 alias of:N*T*Csyscon-reboot-modeC* syscon_reboot_mode
-alias of:N*T*Csgm,sgm38121 sgm38121
-alias of:N*T*Csgm,sgm38121C* sgm38121
-alias of:N*T*Cwillsemi,wl2866d sgm38121
-alias of:N*T*Cwillsemi,wl2866dC* sgm38121
-alias i2c:sgm38121-regulator sgm38121
 alias of:N*T*Cmediatek,mt6357-lbat_service pmic_lbat_service
 alias of:N*T*Cmediatek,mt6357-lbat_serviceC* pmic_lbat_service
 alias of:N*T*Cmediatek,mt6358-lbat_service pmic_lbat_service
@@ -403,8 +394,11 @@ alias of:N*T*Cmediatek,mt6379-lbat-service-2 pmic_lbat_service
 alias of:N*T*Cmediatek,mt6379-lbat-service-2C* pmic_lbat_service
 alias of:N*T*Cmediatek,mt6685 mt6685_core
 alias of:N*T*Cmediatek,mt6685C* mt6685_core
+alias rtnl-link-miwill miwill
 alias of:N*T*Cmediatek,mt6681-auxadc mt6681_auxadc
 alias of:N*T*Cmediatek,mt6681-auxadcC* mt6681_auxadc
+alias of:N*T*Co10_42_02_0a_dsc_vdo,lcm panel_o10_42_02_0a_dsc_vdo
+alias of:N*T*Co10_42_02_0a_dsc_vdo,lcmC* panel_o10_42_02_0a_dsc_vdo
 alias platform:mtk-spi spi_mt65xx
 alias of:N*T*Cmediatek,mt2701-spi spi_mt65xx
 alias of:N*T*Cmediatek,mt2701-spiC* spi_mt65xx
@@ -471,8 +465,6 @@ alias of:N*T*Cmediatek,mt2712-display mediatek_drm
 alias of:N*T*Cmediatek,mt2712-displayC* mediatek_drm
 alias of:N*T*Cmediatek,mt6779-mmsys mediatek_drm
 alias of:N*T*Cmediatek,mt6779-mmsysC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-mmsys mediatek_drm
-alias of:N*T*Cmediatek,mt6771-mmsysC* mediatek_drm
 alias of:N*T*Cmediatek,mt6761-mmsys mediatek_drm
 alias of:N*T*Cmediatek,mt6761-mmsysC* mediatek_drm
 alias of:N*T*Cmediatek,mt6765-mmsys mediatek_drm
@@ -543,8 +535,6 @@ alias of:N*T*Cmediatek,mt6765-disp-color mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-colorC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-color mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-colorC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-color mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-colorC* mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-color mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-colorC* mediatek_drm
 alias of:N*T*Cmediatek,mt6877-disp-color mediatek_drm
@@ -585,8 +575,6 @@ alias of:N*T*Cmediatek,mt6765-disp-ccorr mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-ccorrC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-ccorr mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-ccorrC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-ccorr mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-ccorrC* mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-ccorr mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-ccorrC* mediatek_drm
 alias of:N*T*Cmediatek,mt6877-disp-ccorr mediatek_drm
@@ -673,8 +661,6 @@ alias of:N*T*Cmediatek,mt6989-disp-gamma mediatek_drm
 alias of:N*T*Cmediatek,mt6989-disp-gammaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6878-disp-gamma mediatek_drm
 alias of:N*T*Cmediatek,mt6878-disp-gammaC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-gamma mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-gammaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6991-disp-gamma mediatek_drm
 alias of:N*T*Cmediatek,mt6991-disp-gammaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6899-disp-gamma mediatek_drm
@@ -683,8 +669,6 @@ alias of:N*T*Cmediatek,mt6768-disp-aal mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-aalC* mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-aal mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-aalC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-aal mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-aalC* mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-aal mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-aalC* mediatek_drm
 alias of:N*T*Cmediatek,mt6833-disp-aal mediatek_drm
@@ -725,8 +709,6 @@ alias of:N*T*Cmediatek,mt6765-disp-dither mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-ditherC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-dither mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-ditherC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-dither mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-ditherC* mediatek_drm
 alias of:N*T*Cmediatek,mt6781-disp-dither mediatek_drm
 alias of:N*T*Cmediatek,mt6781-disp-ditherC* mediatek_drm
 alias of:N*T*Cmediatek,mt6885-disp-dither mediatek_drm
@@ -785,8 +767,6 @@ alias of:N*T*Cmediatek,mt6765-disp-ovl mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-ovlC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-ovl mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-ovlC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-ovl mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-ovlC* mediatek_drm
 alias of:N*T*Cmediatek,mt6779-disp-ovl mediatek_drm
 alias of:N*T*Cmediatek,mt6779-disp-ovlC* mediatek_drm
 alias of:N*T*Cmediatek,mt8173-disp-ovl mediatek_drm
@@ -827,8 +807,6 @@ alias of:N*T*Cmediatek,mt2701-disp-rdma mediatek_drm
 alias of:N*T*Cmediatek,mt2701-disp-rdmaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-rdma mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-rdmaC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-rdma mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-rdmaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-rdma mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-rdmaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-rdma mediatek_drm
@@ -923,8 +901,6 @@ alias of:N*T*Cmediatek,mt6779-disp-wdma mediatek_drm
 alias of:N*T*Cmediatek,mt6779-disp-wdmaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-wdma mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-wdmaC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-wdma mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-wdmaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-wdma mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-wdmaC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-wdma mediatek_drm
@@ -973,8 +949,6 @@ alias of:N*T*Cmediatek,mt6779-disp-mutex mediatek_drm
 alias of:N*T*Cmediatek,mt6779-disp-mutexC* mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-mutex mediatek_drm
 alias of:N*T*Cmediatek,mt6761-disp-mutexC* mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-mutex mediatek_drm
-alias of:N*T*Cmediatek,mt6771-disp-mutexC* mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-mutex mediatek_drm
 alias of:N*T*Cmediatek,mt6765-disp-mutexC* mediatek_drm
 alias of:N*T*Cmediatek,mt6768-disp-mutex mediatek_drm
@@ -1107,8 +1081,6 @@ alias of:N*T*Cmediatek,mt6985-disp-merge mediatek_drm
 alias of:N*T*Cmediatek,mt6985-disp-mergeC* mediatek_drm
 alias of:N*T*Cmediatek,mt6897-disp-merge mediatek_drm
 alias of:N*T*Cmediatek,mt6897-disp-mergeC* mediatek_drm
-alias of:N*T*Cmediatek,mt6991-disp-merge mediatek_drm
-alias of:N*T*Cmediatek,mt6991-disp-mergeC* mediatek_drm
 alias of:N*T*Cmediatek,mt6885-dmdp-aal mediatek_drm
 alias of:N*T*Cmediatek,mt6885-dmdp-aalC* mediatek_drm
 alias of:N*T*Cmediatek,mt6983-dmdp-aal mediatek_drm
@@ -1205,8 +1177,6 @@ alias of:N*T*Cmediatek,mt6991-vdisp-ao mediatek_drm
 alias of:N*T*Cmediatek,mt6991-vdisp-aoC* mediatek_drm
 alias of:N*T*Cmediatek,mt6991-disp-splitter mediatek_drm
 alias of:N*T*Cmediatek,mt6991-disp-splitterC* mediatek_drm
-alias of:N*T*Cmediatek,mt6899-disp-splitter mediatek_drm
-alias of:N*T*Cmediatek,mt6899-disp-splitterC* mediatek_drm
 alias of:N*T*Cmediatek,mt6885-dp-intf mediatek_drm
 alias of:N*T*Cmediatek,mt6885-dp-intfC* mediatek_drm
 alias of:N*T*Cmediatek,mt6895-dp-intf mediatek_drm
@@ -1231,10 +1201,14 @@ alias of:N*T*Cmediatek,mt6991-pcie-phy phy_mtk_pcie
 alias of:N*T*Cmediatek,mt6991-pcie-phyC* phy_mtk_pcie
 alias of:N*T*Cmediatek,mt8183-ufsphy phy_mtk_ufs
 alias of:N*T*Cmediatek,mt8183-ufsphyC* phy_mtk_ufs
+alias of:N*T*Ctruly,td4330,cmd panel_truly_td4330_cmd
+alias of:N*T*Ctruly,td4330,cmdC* panel_truly_td4330_cmd
 alias of:N*T*Cmediatek,mt6375-tcpc tcpc_mt6375
 alias of:N*T*Cmediatek,mt6375-tcpcC* tcpc_mt6375
 alias of:N*T*Cmediatek,mt6899-mmqos mmqos_mt6899
 alias of:N*T*Cmediatek,mt6899-mmqosC* mmqos_mt6899
+alias of:N*T*Cjdi,nt36672e,cphy,vdo panel_alpha_jdi_nt36672e_cphy_vdo
+alias of:N*T*Cjdi,nt36672e,cphy,vdoC* panel_alpha_jdi_nt36672e_cphy_vdo
 alias fixed-partitions ofpart
 alias ofoldpart ofpart
 alias of:N*T*Cfixed-partitions ofpart
@@ -1255,6 +1229,7 @@ alias platform:pd_cp_manager pd_single_cp_manager
 alias platform:pd_cp_manager_gl pd_single_cp_manager
 alias of:N*T*Cmediatek,pwm-leds leds_mtk_pwm
 alias of:N*T*Cmediatek,pwm-ledsC* leds_mtk_pwm
+alias rtnl-link-minet minet
 alias of:N*T*Cmediatek,common-disp-iommu-bank1 iommu_secure
 alias of:N*T*Cmediatek,common-disp-iommu-bank1C* iommu_secure
 alias of:N*T*Cmediatek,common-disp-iommu-bank2 iommu_secure
@@ -1346,6 +1321,7 @@ alias of:N*T*Cmediatek,mt6985-uartC* 8250_mtk
 alias of:N*T*Cbq28z610 bq28z610
 alias of:N*T*Cbq28z610C* bq28z610
 alias i2c:bq28z610 bq28z610
+alias i2c:aw21024_led leds_aw21024
 alias of:N*T*Cmediatek,mkp-drv mkp
 alias of:N*T*Cmediatek,mkp-drvC* mkp
 alias of:N*T*Cmediatek,mt8135-mmc mtk_mmc
@@ -1372,8 +1348,6 @@ alias of:N*T*Cmediatek,mt6761-mmc mtk_mmc
 alias of:N*T*Cmediatek,mt6761-mmcC* mtk_mmc
 alias of:N*T*Cmediatek,mt6768-mmc mtk_mmc
 alias of:N*T*Cmediatek,mt6768-mmcC* mtk_mmc
-alias of:N*T*Cmediatek,mt6771-mmc mtk_mmc
-alias of:N*T*Cmediatek,mt6771-mmcC* mtk_mmc
 alias of:N*T*Cmediatek,mt6877-mmc mtk_mmc
 alias of:N*T*Cmediatek,mt6877-mmcC* mtk_mmc
 alias of:N*T*Cmediatek,common-mmc-v2 mtk_mmc
@@ -1720,7 +1694,6 @@ alias of:N*T*Crichtek,rt4803 rt4803
 alias of:N*T*Crichtek,rt4803C* rt4803
 alias of:N*T*Carm,dsu-pmu arm_dsu_pmu
 alias of:N*T*Carm,dsu-pmuC* arm_dsu_pmu
-alias i2c:aw21024_led leds_color21024
 alias of:N*T*Cmediatek,charger,pd mtk_pd_charging
 alias of:N*T*Cmediatek,charger,pdC* mtk_pd_charging
 alias of:N*T*Cmediatek,mt6873-dvfsrc mtk_emi

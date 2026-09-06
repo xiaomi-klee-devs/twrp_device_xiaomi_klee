@@ -10,7 +10,7 @@
 # ============================================================================
 set -euo pipefail
 
-OUTPUT_DIR="${1:-klee-compat-$(date +%Y%m%d-%H%M%S)}"
+OUTPUT_DIR="${1:-rodin-compat-$(date +%Y%m%d-%H%M%S)}"
 IMAGE="${2:-}"
 
 mkdir -p "${OUTPUT_DIR}"
@@ -55,15 +55,15 @@ for name in \
     ro.boot.slot_suffix ro.boot.hardware ro.boot.bootreason \
     ro.boot.verifiedbootstate ro.boot.vbmeta.device_state \
     vendor.touch.modules.ready vendor.touch.service.ready \
-    init.svc.klee-touch-loader init.svc.klee-touchfeature \
-    init.svc.klee-touch-wait; do
+    init.svc.rodin-touch-loader init.svc.rodin-touchfeature \
+    init.svc.rodin-touch-wait; do
     printf "%s=%s\n" "$name" "$(getprop "$name")"
 done'
 capture_shell kernel.txt 'uname -a; cat /proc/version; cat /proc/cmdline'
 capture_shell modules.txt 'cat /proc/modules'
 capture_shell touch-modules.txt '
 cat /proc/modules | grep -E "goodix|focaltech|fts|xiaomi_touch|scp|tinysys" || true
-for module in nt38771_touch_klee xiaomi_touch_klee scp; do
+for module in nt38771_touch_rodin xiaomi_touch_rodin scp; do
     if [ -d "/sys/module/$module" ]; then
         echo "loaded: $module"
     fi
@@ -96,8 +96,8 @@ for path in \
 done'
 capture_shell touch-files.txt '
 ls -l /lib/modules/*goodix* /lib/modules/*focal* /lib/modules/*touch* 2>/dev/null
-sha256sum /lib/modules/nt38771_touch_klee.ko \
-    /lib/modules/xiaomi_touch_klee.ko 2>/dev/null || true'
+sha256sum /lib/modules/nt38771_touch_rodin.ko \
+    /lib/modules/xiaomi_touch_rodin.ko 2>/dev/null || true'
 capture_shell block-layout.txt '
 slot="$(getprop ro.boot.slot_suffix)"
 ls -l /dev/block/by-name/vendor_boot* /dev/block/by-name/boot* \

@@ -1,5 +1,5 @@
 /*
- * klee_omapi_bridge - OMAPI service for OrangeFox recovery.
+ * rodin_omapi_bridge - OMAPI service for OrangeFox recovery.
  *
  * Publishes android.se.omapi.ISecureElementService/default backed by the
  * eSE1 Secure Element HAL, so SIM-based credential decryption (OMAPI flows)

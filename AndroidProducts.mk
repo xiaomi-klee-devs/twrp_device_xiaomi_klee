@@ -1,6 +1,6 @@
-# Lunch targets for the klee device tree.
-# twrp_klee is the single product; -eng is the only build type needed.
+# Lunch targets for the rodin device tree.
+# twrp_rodin is the single product; -eng is the only build type needed.
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/twrp_klee.mk
+    $(LOCAL_DIR)/twrp_rodin.mk
 
-COMMON_LUNCH_CHOICES := twrp_klee-eng
+COMMON_LUNCH_CHOICES := twrp_rodin-eng

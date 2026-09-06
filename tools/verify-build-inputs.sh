@@ -49,6 +49,6 @@ if (( failures > 0 )); then
     exit 1
 fi
 
-echo "klee build input verification passed"
+echo "rodin build input verification passed"
 echo "OrangeFox top: ${TOP_DIR}"
 echo "Device tree:   ${DEVICE_DIR}"

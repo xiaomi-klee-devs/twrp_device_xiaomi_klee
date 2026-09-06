@@ -1,5 +1,5 @@
 # ============================================================================
-# Main device init rc (MT6899 / klee)
+# Main device init rc (MT6899 / rodin)
 # Imports the boot-control and keymint/TEE service definitions and sets up
 # early boot props, SELinux enforcing, USB controller and the loader
 # services started on `boot`.
@@ -41,9 +41,11 @@ service load-haptic-modules /system/bin/load-haptic-modules.sh
     group root input system
     seclabel u:r:recovery:s0
 
+on early-boot
+    start load-touch-modules
+
 on boot
     start boot-hal-1-2
     start health-hal-2-1
-    start load-touch-modules
     start create-bootdevice-link
     start load-haptic-modules

@@ -1,6 +1,6 @@
 # ============================================================================
 # AIDL boot control HAL wrapper (slot switching for A/B OTA)
-# Runs the MTK boot service with libklee_libcxx_compat preloaded to satisfy
+# Runs the MTK boot service with librodin_libcxx_compat preloaded to satisfy
 # its libc++ verbose-abort dependency in the APEX-less recovery env.
 # ============================================================================
 
@@ -9,7 +9,7 @@ service vendor.boot-default /vendor/bin/hw/android.hardware.boot-service.mtk
     user root
     group root system
     setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw
-    setenv LD_PRELOAD /system/lib64/libklee_libcxx_compat.so
+    setenv LD_PRELOAD /system/lib64/librodin_libcxx_compat.so
     seclabel u:r:hal_bootctl_default:s0
     interface aidl android.hardware.boot.IBootControl/default
 

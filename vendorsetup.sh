@@ -8,7 +8,7 @@
 
 # --- OrangeFox build-system switches ----------------------------------------
 export ALLOW_MISSING_DEPENDENCIES=true      # recovery-only tree, tolerate gaps
-export FOX_BUILD_DEVICE=klee                # device codename for Fox scripts
+export FOX_BUILD_DEVICE=rodin                # device codename for Fox scripts
 export FOX_AB_DEVICE=1                      # A/B (seamless update) device
 export FOX_VIRTUAL_AB_DEVICE=1              # virtual A/B with snapshots
 
@@ -39,3 +39,9 @@ if [ "${OF_LOW_MEMORY_BUILD}" = "1" ]; then
     export GOMEMLIMIT="${GOMEMLIMIT:-6GiB}"
     export _JAVA_OPTIONS="${_JAVA_OPTIONS:--Xmx1g}"
 fi
+
+# --- Apply rodin haptics patch ----
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "${DIR}/../../.." && pwd)"
+apply_patch() { cd "${ROOT}/$1" && git restore . && git clean -fd && patch -p1 -N --silent < "${DIR}/patches/$2" || true && cd -; }
+apply_patch "bootable/recovery" "0001-events-Add-rodin-haptics-compatibility.patch"

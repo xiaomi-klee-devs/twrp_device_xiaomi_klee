@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build a klee vendor-boot DTB without Android USB offload coupling.
+"""Build a rodin vendor-boot DTB without Android USB offload coupling.
 
-Reads the stock MTK-wrapped DTB (prebuilt/dtb/mt6899-klee.dtb), removes the
+Reads the stock MTK-wrapped DTB (prebuilt/dtb/mt6899-rodin.dtb), removes the
 `mediatek,usb-offload` property from the xhci0 node so the recovery kernel
 does not bind USB offload to a missing userspace service, and writes an
 unwrapped/padded copy ready for mkbootimg --dtb.
@@ -47,7 +47,7 @@ def patch_dtb(input_path: pathlib.Path, output_path: pathlib.Path) -> None:
     if inner_dtb[:4] != FDT_MAGIC:
         raise RuntimeError("MediaTek wrapper does not contain an FDT at its declared offset")
 
-    with tempfile.TemporaryDirectory(prefix="klee-dtb-") as temporary_directory:
+    with tempfile.TemporaryDirectory(prefix="rodin-dtb-") as temporary_directory:
         inner_path = pathlib.Path(temporary_directory) / "inner.dtb"
         inner_path.write_bytes(inner_dtb)
 

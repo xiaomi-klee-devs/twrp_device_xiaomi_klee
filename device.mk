@@ -1,5 +1,5 @@
 # ============================================================================
-# Product configuration - POCO X8 Pro / Redmi Turbo 5 (klee) OrangeFox recovery
+# Product configuration - POCO X7 Pro / Redmi Turbo 4 (rodin) OrangeFox recovery
 # Everything installed here ends up inside the vendor_boot recovery ramdisk.
 # ============================================================================
 
@@ -9,7 +9,7 @@
 # - base/emulated_storage : standard recovery bits + /sdcard emulation
 # - virtual_ab_ota/* : virtual A/B with userspace snapshots (VAB compression)
 # ----------------------------------------------------------------------------
-DEVICE_PATH := device/xiaomi/klee
+DEVICE_PATH := device/xiaomi/rodin
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
@@ -118,8 +118,8 @@ PRODUCT_PACKAGES += \
 # - fsck.erofs/fsck.f2fs/make_f2fs : filesystem repair/format tools
 # - lpdump/lpunpack        : inspect/unpack super partition images
 # - snapuserd(+ramdisk)    : userspace snapshot daemon for VAB merges
-# - klee_omapi_bridge      : OMAPI <-> eSE bridge for SIM-toolkit decryption
-# - libklee_libcxx_compat  : libc++ verbose-abort shim shared by vendor HALs
+# - rodin_omapi_bridge      : OMAPI <-> eSE bridge for SIM-toolkit decryption
+# - librodin_libcxx_compat  : libc++ verbose-abort shim shared by vendor HALs
 # ----------------------------------------------------------------------------
 PRODUCT_PACKAGES += \
     create_pl_dev \
@@ -127,8 +127,8 @@ PRODUCT_PACKAGES += \
     fastbootd \
     fsck.erofs \
     fsck.f2fs \
-    klee_omapi_bridge \
-    libklee_libcxx_compat \
+    rodin_omapi_bridge \
+    librodin_libcxx_compat \
     lpdump \
     lpunpack \
     make_f2fs \

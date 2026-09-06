@@ -18,7 +18,7 @@ void KleeLibcppVerboseAbort(const char* format, ...)
 void KleeLibcppVerboseAbort(const char* format, ...) {
     va_list args;
     va_start(args, format);
-    __android_log_vprint(ANDROID_LOG_FATAL, "klee-libcxx-compat", format, args);
+    __android_log_vprint(ANDROID_LOG_FATAL, "rodin-libcxx-compat", format, args);
     va_end(args);
     abort();
 }
