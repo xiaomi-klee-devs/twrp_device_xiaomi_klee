@@ -41,9 +41,11 @@ service load-haptic-modules /system/bin/load-haptic-modules.sh
     group root input system
     seclabel u:r:recovery:s0
 
+on early-boot
+    exec_start load-touch-modules
+
 on boot
     start boot-hal-1-2
     start health-hal-2-1
-    start load-touch-modules
     start create-bootdevice-link
     start load-haptic-modules
