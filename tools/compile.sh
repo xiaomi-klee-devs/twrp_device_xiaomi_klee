@@ -57,8 +57,8 @@ min_swap_kb=$((12 * 1024 * 1024))
 renice -n 15 -p "$$" >/dev/null 2>&1 || true
 ionice -c3 -p "$$" >/dev/null 2>&1 || true
 
-export OUT_DIR="${OUT_DIR:-${TOP_DIR}/out}"
-LOG_DIR="${OUT_DIR}/logs"
+export OUT_DIR="out"
+LOG_DIR="${TOP_DIR}/out/logs"
 mkdir -p "${LOG_DIR}"
 
 TARGETS=("$@")
