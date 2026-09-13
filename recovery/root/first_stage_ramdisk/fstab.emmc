@@ -1,20 +1,16 @@
-# fstab.mt6899 - second-stage fstab (MT6899 / chagall)
+# Dynamic (super) partitions
+system /system erofs ro wait,slotselect,logical,first_stage_mount
+system /system ext4 ro wait,slotselect,logical,first_stage_mount
+system_ext /system_ext erofs ro wait,slotselect,logical,first_stage_mount
+system_ext /system_ext ext4 ro wait,slotselect,logical,first_stage_mount
 
-# Dynamic (super) partitions - AVB verified
-system /system erofs ro wait,slotselect,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system /system ext4 ro wait,slotselect,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system_ext /system_ext erofs ro wait,slotselect,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system_ext /system_ext ext4 ro wait,slotselect,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
+vendor /vendor erofs ro wait,slotselect,logical,first_stage_mount
+vendor /vendor ext4 ro wait,slotselect,logical,first_stage_mount
 
-vendor /vendor erofs ro wait,slotselect,avb,logical,first_stage_mount
-vendor /vendor ext4 ro wait,slotselect,avb,logical,first_stage_mount
-
-product /product erofs ro wait,slotselect,avb,logical,first_stage_mount
-product /product ext4 ro wait,slotselect,avb,logical,first_stage_mount
-
-# mi_ext + product/system overlays (Xiaomi customization layer)
-mi_ext /mnt/vendor/mi_ext erofs ro wait,slotselect,avb=vbmeta,logical,first_stage_mount,nofail
-mi_ext /mnt/vendor/mi_ext ext4 ro wait,slotselect,avb=vbmeta,logical,first_stage_mount,nofail
+product /product erofs ro wait,slotselect,logical,first_stage_mount
+product /product ext4 ro wait,slotselect,logical,first_stage_mount
+mi_ext /mnt/vendor/mi_ext erofs ro wait,slotselect,logical,first_stage_mount,nofail
+mi_ext /mnt/vendor/mi_ext ext4 ro wait,slotselect,logical,first_stage_mount,nofail
 /mnt/vendor/mi_ext /mi_ext erofs ro,bind wait,nofail
 overlay /product/overlay overlay ro,lowerdir=/mnt/vendor/mi_ext/product/overlay/:/product/overlay check,nofail
 overlay /product/app overlay ro,lowerdir=/mnt/vendor/mi_ext/product/app/:/product/app check,nofail
@@ -39,17 +35,17 @@ overlay /product/etc/preferred-apps overlay ro,lowerdir=/mnt/vendor/mi_ext/produ
 overlay /product/etc/security overlay ro,lowerdir=/mnt/vendor/mi_ext/product/etc/security:/product/etc/security check,nofail
 overlay /system_ext/etc/permissions overlay ro,lowerdir=/mnt/vendor/mi_ext/system_ext/etc/permissions:/system_ext/etc/permissions check,nofail
 
-odm /odm erofs ro wait,slotselect,avb,logical,first_stage_mount
-odm /odm ext4 ro wait,slotselect,avb,logical,first_stage_mount
+odm /odm erofs ro wait,slotselect,logical,first_stage_mount
+odm /odm ext4 ro wait,slotselect,logical,first_stage_mount
 
-vendor_dlkm /vendor_dlkm erofs ro wait,slotselect,avb,logical,first_stage_mount
-vendor_dlkm /vendor_dlkm ext4 ro wait,slotselect,avb,logical,first_stage_mount
+vendor_dlkm /vendor_dlkm erofs ro wait,slotselect,logical,first_stage_mount
+vendor_dlkm /vendor_dlkm ext4 ro wait,slotselect,logical,first_stage_mount
 
-odm_dlkm /odm_dlkm erofs ro wait,slotselect,avb,logical,first_stage_mount
-odm_dlkm /odm_dlkm ext4 ro wait,slotselect,avb,logical,first_stage_mount
+odm_dlkm /odm_dlkm erofs ro wait,slotselect,logical,first_stage_mount
+odm_dlkm /odm_dlkm ext4 ro wait,slotselect,logical,first_stage_mount
 
-system_dlkm /system_dlkm erofs ro wait,slotselect,avb,logical,first_stage_mount
-system_dlkm /system_dlkm ext4 ro wait,slotselect,avb,logical,first_stage_mount
+system_dlkm /system_dlkm erofs ro wait,slotselect,logical,first_stage_mount
+system_dlkm /system_dlkm ext4 ro wait,slotselect,logical,first_stage_mount
 
 # Data & metadata
 /dev/block/by-name/metadata /metadata f2fs noatime,nosuid,nodev,discard wait,check,formattable,first_stage_mount
@@ -67,6 +63,7 @@ system_dlkm /system_dlkm ext4 ro wait,slotselect,avb,logical,first_stage_mount
 
 # Removable storage
 /devices/platform/soc/11240000.mmc* auto auto defaults voldmanaged=sdcard1:auto,encryptable=userdata
+
 /devices/platform/usb_xhci* auto vfat defaults voldmanaged=usbotg:auto
 /devices/platform/soc/11201000.usb0/11200000.xhci* auto vfat defaults voldmanaged=usbotg:auto
 /devices/platform/soc/11211000.usb1/11210000.xhci* auto vfat defaults voldmanaged=usbotg:auto
@@ -82,7 +79,7 @@ system_dlkm /system_dlkm ext4 ro wait,slotselect,avb,logical,first_stage_mount
 /dev/block/by-name/init_boot /init_boot emmc defaults defaults
 /dev/block/by-name/boot /boot emmc defaults first_stage_mount,nofail,slotselect
 /dev/block/by-name/vbmeta_vendor /vbmeta_vendor emmc defaults first_stage_mount,nofail,slotselect
-/dev/block/by-name/vbmeta_system /vbmeta_system emmc defaults first_stage_mount,nofail,slotselect,avb=vbmeta
+/dev/block/by-name/vbmeta_system /vbmeta_system emmc defaults first_stage_mount,nofail,slotselect
 /dev/block/by-name/logo /logo emmc defaults defaults
 /dev/block/by-name/expdb /expdb emmc defaults defaults
 /dev/block/by-name/seccfg /seccfg emmc defaults defaults
