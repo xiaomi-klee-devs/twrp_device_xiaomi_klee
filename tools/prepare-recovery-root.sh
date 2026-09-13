@@ -60,12 +60,7 @@ fi
 
 if [ -d "$ramdisk/twres/languages" ]; then
     find "$ramdisk/twres/languages" -maxdepth 1 -type f \
-        ! -name en.xml \
-        ! -name es_ES.xml \
-        ! -name hu_HU.xml \
-        ! -name ja_JP.xml \
-        ! -name zh_CN.xml \
-        ! -name zh_TW.xml \
+        ! -name en_US.xml \
         -delete
 fi
 
