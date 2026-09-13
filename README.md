@@ -1,4 +1,4 @@
-# OrangeFox Recovery Device Tree - Xiaomi 17T
+# OFRP Device Tree - Xiaomi 17T
 
 The Xiaomi 17T (codenamed _"chagall"_) are upper mid-range smartphones from Xiaomi.
 This device were announced in 28 May 2026.
@@ -22,10 +22,8 @@ Camera  | 50MP wide camera, 50MP periscope telephoto, 12MP ultra wide-angle came
 | Path | Purpose |
 |------|---------|
 | `AndroidProducts.mk`, `twrp_chagall.mk` | Lunch target (`twrp_chagall-eng`) |
-| `omni_chagall.mk` | Omni-style product alias with stock ROM fingerprint |
 | `BoardConfig.mk` | Board: arch, boot header, partitions, recovery flags (grouped + commented) |
 | `device.mk` | Product packages, A/B OTA config, props |
-| `fox_chagall.mk` | OrangeFox-only device flags |
 | `vendorsetup.sh` | Env defaults sourced by `envsetup.sh` |
 | `Android.bp` | All Soong module definitions (sources live under `src/`) |
 | `src/` | First-party C/C++ sources, one folder per module |
