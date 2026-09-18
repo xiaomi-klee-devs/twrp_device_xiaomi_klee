@@ -22,10 +22,8 @@ Camera  | 50MP wide camera, 8MP ultra wide-angle camera, 20MP front camera
 | Path | Purpose |
 |------|---------|
 | `AndroidProducts.mk`, `twrp_klee.mk` | Lunch target (`twrp_klee-eng`) |
-| `omni_klee.mk` | Omni-style product alias with stock ROM fingerprint |
 | `BoardConfig.mk` | Board: arch, boot header, partitions, recovery flags (grouped + commented) |
 | `device.mk` | Product packages, A/B OTA config, props |
-| `fox_klee.mk` | OrangeFox-only device flags |
 | `vendorsetup.sh` | Env defaults sourced by `envsetup.sh` |
 | `Android.bp` | All Soong module definitions (sources live under `src/`) |
 | `src/` | First-party C/C++ sources, one folder per module |
@@ -55,7 +53,7 @@ Camera  | 50MP wide camera, 8MP ultra wide-angle camera, 20MP front camera
 ## Building
 
 Builds are done through **GitHub Actions** - no local source tree required.
-The workflow (`.github/workflows/build.yml`) handles everything end-to-end:
+The workflow (`.github/workflows/compile.yml`) handles everything end-to-end:
 syncing the pinned OrangeFox sources, applying patches, verifying inputs,
 building, repacking and publishing the image.
 
@@ -72,7 +70,7 @@ The job runs on a `self-hosted` runner and hard-fails without enough capacity:
 ### No self-hosted runner? Use a free GitHub-hosted one
 
 Fork this repository, then in **your fork** edit
-`.github/workflows/build.yml` and change:
+`.github/workflows/compile.yml` and change:
 
 ```yaml
 runs-on: self-hosted
