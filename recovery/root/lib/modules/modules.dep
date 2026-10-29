@@ -1,8 +1,0 @@
-/lib/modules/miev.ko:
-/lib/modules/p73.ko: /lib/modules/nxp_i2c.ko /lib/modules/spi-mt65xx.ko /lib/modules/irq-dbg.ko
-/lib/modules/spi-mt65xx.ko: /lib/modules/irq-dbg.ko
-/lib/modules/tms_device_modules.ko: /lib/modules/p73.ko /lib/modules/nxp_i2c.ko /lib/modules/spi-mt65xx.ko /lib/modules/irq-dbg.ko
-/lib/modules/irq-dbg.ko:
-/lib/modules/nxp_i2c.ko:
-/lib/modules/nt38771_touch_klee.ko: /lib/modules/xiaomi_touch_klee.ko /lib/modules/miev.ko
-/lib/modules/xiaomi_touch_klee.ko: /lib/modules/miev.ko
