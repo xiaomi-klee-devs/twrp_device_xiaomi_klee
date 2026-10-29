@@ -7,10 +7,11 @@
 #   1. refresh libminuitwrp.so from the current build output
 #   2. force MiSans font in all theme XMLs, drop unused fonts
 #   3. keep only the languages this build ships
-#   4. remove lpdump/snapshot daemons superseded by lptools
-#   5. strip .gnu_debugdata sections, UPX-pack selected binaries
-#   6. move /sbin duplicates into /system/bin (symlinked back)
-#   7. trim terminfo to ansi/linux/vt100/xterm/xterm-256color
+#   4. debloat /system/lib64 libraries that nothing in the image references
+#   5. remove lpdump/snapshot daemons superseded by lptools
+#   6. strip .gnu_debugdata sections, UPX-pack selected binaries
+#   7. move /sbin duplicates into /system/bin (symlinked back)
+#   8. trim terminfo to ansi/linux/vt100/xterm/xterm-256color
 #
 # NOTE: upx_binaries below must exist or the build FAILS on purpose - keep it
 # in sync with what TWRP/OFOX install into /system/bin.
@@ -59,6 +60,93 @@ if [ ! -x "$objcopy_bin" ] || [ ! -x "$readelf_bin" ]; then
     echo "missing LLVM ELF tools" >&2
     exit 1
 fi
+
+# ---------------------------------------------------------------------------
+# Debloat /system/lib64.
+#
+# Every entry below has been checked against a full klee recovery ramdisk:
+# no executable, HAL or remaining library references it through DT_NEEDED or
+# a dlopen string. The verifier below re-checks the assembled ramdisk and
+# aborts the build if a package/toolchain update starts needing one of them.
+#
+# Do NOT add libraries that are referenced only at runtime by name (LD_PRELOAD,
+# dlopen, HAL manifests) without re-checking the resulting ramdisk.
+# Keep libc++_hos.so (LD_PRELOAD in init.recovery.keymint.rc), libcap.so (logd),
+# libhidltransport.so (vendor compatibility), and the health/keymaster/
+# gatekeeper/weaver/boot stubs that recovery or libtar still link.
+# ---------------------------------------------------------------------------
+debloat_lib64=(
+    # Full adbd service/API stack. This image's adbd and minadbd only link
+    # libadbd_auth/libadbd_fs, so the implementation libs are dead weight.
+    libadbd.so
+    libadbd_services.so
+    libadbconnection_server.so
+    libadb_protos.so
+    libapp_processes_protos_lite.so
+    libadb_crypto.so
+    libadb_tls_connection.so
+    libadb_sysdeps.so
+    libcutils_sockets.so
+    libmdnssd.so
+
+    # Not pulled in by recovery, TWRP, or any retained HAL.
+    libandroid_runtime_lazy.so
+    libext2_profile.so
+    libfs_mgr_binder.so
+    libnl.so
+    libnos_datagram.so
+    libnos_transport.so
+    libservices.so
+    libsoftkeymasterdevice.so
+    libutilscallstack.so
+    libxml2.so
+
+    # HIDL/AIDL stubs for HALs recovery never talks to.
+    android.frameworks.stats-V1-ndk.so
+    android.hardware.vibrator@1.0.so
+    android.hardware.vibrator@1.1.so
+    android.hardware.vibrator@1.2.so
+    android.hardware.vibrator-V1-cpp.so
+    android.hardware.vibrator-V1-ndk.so
+    android.hardware.vibrator-V2-cpp.so
+    android.hardware.vibrator-V2-ndk.so
+    android.system.keystore2-V3-ndk.so
+    android.system.suspend@1.0.so
+    android.system.wifi.keystore@1.0.so
+)
+
+removed_lib64=()
+for name in "${debloat_lib64[@]}"; do
+    lib="$ramdisk/system/lib64/$name"
+    if [ -f "$lib" ]; then
+        rm -f "$lib"
+        removed_lib64+=("$name")
+    fi
+done
+
+if [ "${#removed_lib64[@]}" -gt 0 ]; then
+    removed_list="$(mktemp)"
+    trap 'rm -f "$removed_list"' EXIT
+    printf '%s\n' "${removed_lib64[@]}" > "$removed_list"
+
+    while IFS= read -r -d '' binary; do
+        file "$binary" | grep -q ELF || continue
+        if "$readelf_bin" -d "$binary" 2>/dev/null |
+                grep 'Shared library:' |
+                sed 's/.*\[\([^]]*\)\].*/\1/' |
+                grep -Fxf "$removed_list" >/dev/null ||
+                strings -a "$binary" 2>/dev/null |
+                grep -Fxf "$removed_list" >/dev/null; then
+            echo "debloat: $binary still references a removed library" >&2
+            exit 1
+        fi
+    done < <(find "$ramdisk/system" "$ramdisk/sbin" "$ramdisk/vendor" -type f -print0)
+
+    echo "-- Debloated ${#removed_lib64[@]} unused libraries from /system/lib64"
+    rm -f "$removed_list"
+    trap - EXIT
+fi
+
 while IFS= read -r -d '' binary; do
     if file "$binary" | grep -q ELF && \
             "$readelf_bin" -SW "$binary" 2>/dev/null | grep -q '\.gnu_debugdata'; then
