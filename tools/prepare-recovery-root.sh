@@ -5,13 +5,12 @@
 # Called once (with --first-call) right after the recovery ramdisk is
 # assembled. Slims the ramdisk so vendor_boot stays under 64 MiB:
 #   1. refresh libminuitwrp.so from the current build output
-#   2. keep only the touch/haptic/misc .ko modules klee actually needs
-#   3. force MiSans font in all theme XMLs, drop unused fonts
-#   4. keep only the languages this build ships
-#   5. remove lpdump/snapshot daemons superseded by lptools
-#   6. strip .gnu_debugdata sections, UPX-pack selected binaries
-#   7. move /sbin duplicates into /system/bin (symlinked back)
-#   8. trim terminfo to ansi/linux/vt100/xterm/xterm-256color
+#   2. force MiSans font in all theme XMLs, drop unused fonts
+#   3. keep only the languages this build ships
+#   4. remove lpdump/snapshot daemons superseded by lptools
+#   5. strip .gnu_debugdata sections, UPX-pack selected binaries
+#   6. move /sbin duplicates into /system/bin (symlinked back)
+#   7. trim terminfo to ansi/linux/vt100/xterm/xterm-256color
 #
 # NOTE: upx_binaries below must exist or the build FAILS on purpose - keep it
 # in sync with what TWRP/OFOX install into /system/bin.
@@ -32,19 +31,6 @@ minuitwrp_dst="$ramdisk/system/lib64/libminuitwrp.so"
 if [ -f "$minuitwrp_src" ]; then
     echo "-- Refreshing recovery libminuitwrp.so from the current build output"
     cp -fp "$minuitwrp_src" "$minuitwrp_dst"
-fi
-
-if [ -d "$ramdisk/lib/modules" ]; then
-    find "$ramdisk/lib/modules" -maxdepth 1 -type f -name '*.ko' -print0 |
-        while IFS= read -r -d '' module; do
-            case "$(basename "$module")" in
-                nt38771_touch_klee.ko|xiaomi_touch_klee.ko|nxp_i2c.ko|p73.ko|spi-mt65xx.ko|irq-dbg.ko|haptic.ko|miev.ko|aac_haptic.ko)
-                    ;;
-                *)
-                    rm -f "$module"
-                    ;;
-            esac
-        done
 fi
 
 if [ -d "$ramdisk/twres/fonts" ]; then
