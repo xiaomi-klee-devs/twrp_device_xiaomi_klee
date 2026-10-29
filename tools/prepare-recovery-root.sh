@@ -1,21 +1,6 @@
 #!/bin/bash
-# ============================================================================
-# prepare-recovery-root.sh - OrangeFox BOARD_RECOVERY_IMAGE_PREPARE hook
-#
-# Called once (with --first-call) right after the recovery ramdisk is
-# assembled. Slims the ramdisk so vendor_boot stays under 64 MiB:
-#   1. refresh libminuitwrp.so from the current build output
-#   2. force MiSans font in all theme XMLs, drop unused fonts
-#   3. keep only the languages this build ships
-#   4. debloat /system/lib64 libraries that nothing in the image references
-#   5. remove lpdump/snapshot daemons superseded by lptools
-#   6. strip .gnu_debugdata sections, UPX-pack selected binaries
-#   7. move /sbin duplicates into /system/bin (symlinked back)
-#   8. trim terminfo to ansi/linux/vt100/xterm/xterm-256color
-#
-# NOTE: upx_binaries below must exist or the build FAILS on purpose - keep it
-# in sync with what TWRP/OFOX install into /system/bin.
-# ============================================================================
+# Slims the recovery ramdisk so vendor_boot stays under 64 MiB.
+# upx_binaries must exist or the build fails on purpose.
 set -e
 
 ramdisk="$1"
@@ -61,23 +46,9 @@ if [ ! -x "$objcopy_bin" ] || [ ! -x "$readelf_bin" ]; then
     exit 1
 fi
 
-# ---------------------------------------------------------------------------
-# Debloat /system/lib64.
-#
-# Every entry below has been checked against a full klee recovery ramdisk:
-# no executable, HAL or remaining library references it through DT_NEEDED or
-# a dlopen string. The verifier below re-checks the assembled ramdisk and
-# aborts the build if a package/toolchain update starts needing one of them.
-#
-# Do NOT add libraries that are referenced only at runtime by name (LD_PRELOAD,
-# dlopen, HAL manifests) without re-checking the resulting ramdisk.
-# Keep libc++_hos.so (LD_PRELOAD in init.recovery.keymint.rc), libcap.so (logd),
-# libhidltransport.so (vendor compatibility), and the health/keymaster/
-# gatekeeper/weaver/boot stubs that recovery or libtar still link.
-# ---------------------------------------------------------------------------
+# Libraries checked against the assembled ramdisk; the verifier below aborts
+# the build if anything still references one of them.
 debloat_lib64=(
-    # Full adbd service/API stack. This image's adbd and minadbd only link
-    # libadbd_auth/libadbd_fs, so the implementation libs are dead weight.
     libadbd.so
     libadbd_services.so
     libadbconnection_server.so
@@ -89,7 +60,6 @@ debloat_lib64=(
     libcutils_sockets.so
     libmdnssd.so
 
-    # Not pulled in by recovery, TWRP, or any retained HAL.
     libandroid_runtime_lazy.so
     libext2_profile.so
     libfs_mgr_binder.so
@@ -101,7 +71,6 @@ debloat_lib64=(
     libutilscallstack.so
     libxml2.so
 
-    # HIDL/AIDL stubs for HALs recovery never talks to.
     android.frameworks.stats-V1-ndk.so
     android.hardware.vibrator@1.0.so
     android.hardware.vibrator@1.1.so

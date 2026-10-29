@@ -1,11 +1,10 @@
-#change partition permission
-# eMMC only
+# eMMC
 /dev/block/mmcblk0                               0660    root    system
 /dev/block/mmcblk0boot0                          0660    root    system
 /dev/block/mmcblk0boot1                          0660    root    system
 /dev/misc-sd                                     0660    root    system
 
-# UFS only
+# UFS
 /dev/block/sda                                   0660    root    system
 /dev/block/sdb                                   0660    root    system
 /dev/block/sdc                                   0660    root    system
@@ -214,9 +213,7 @@
 # Change ION driver permission
 /dev/ion                  0666   system     graphics
 
-# Change DMA_HEAP deice permission
-#     refs: /system/core/rootdir/uevent.rc
-#           /dev/dma_heap/system      0444   system     system
+# DMA_HEAP
 /dev/dma_heap/mtk_mm                        0444   system     system
 /dev/dma_heap/mtk_mm-uncached               0444   system     system
 /dev/dma_heap/mtk_svp_page-uncached                 0444   system     system

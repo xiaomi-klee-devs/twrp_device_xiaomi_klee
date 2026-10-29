@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SWAPFILE=/swapfile
-SWAPSIZE=8G   # غيّر الحجم حسب الحاجة (مثلاً 8G، 12G، ...)
+SWAPSIZE=8G
 
 if sudo swapon --show=NAME | awk '{print $1}' | grep -qx "$SWAPFILE"; then
   echo "Swap already active at $SWAPFILE — skipping creation."

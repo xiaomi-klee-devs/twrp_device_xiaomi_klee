@@ -1,2 +1,1 @@
-# Placeholder kept for parity with the stock klee recovery ramdisk
-# (the stock image ships this file empty).
+# Intentionally empty; matches the stock klee recovery ramdisk.

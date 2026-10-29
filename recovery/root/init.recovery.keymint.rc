@@ -1,8 +1,4 @@
-# ============================================================================
-# TEE stack: tee-supplicant + Mitee keymint/gatekeeper HALs
-# Started in order: tee-supplicant -> keymint -> secure element ->
-# klee.fbe_prep (embedded Weaver bring-up, see system/bin/klee_fbe_prep.sh).
-# ============================================================================
+# TEE stack: tee-supplicant, keymint, secure element and Weaver bring-up
 
 service tee-supplicant /vendor/bin/tee-supplicant
     class core

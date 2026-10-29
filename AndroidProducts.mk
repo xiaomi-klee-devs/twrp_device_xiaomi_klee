@@ -1,5 +1,4 @@
-# Lunch targets for the klee device tree.
-# twrp_klee is the single product; -eng is the only build type needed.
+# Lunch targets
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/twrp_klee.mk
 

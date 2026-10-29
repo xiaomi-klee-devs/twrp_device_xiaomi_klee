@@ -1,9 +1,4 @@
-# ============================================================================
 # Main device init rc (MT6899 / klee)
-# Imports the boot-control and keymint/TEE service definitions and sets up
-# early boot props, SELinux enforcing, USB controller and the loader
-# services started on `boot`.
-# ============================================================================
 
 import /init.recovery.bootctl.rc
 import /init.recovery.keymint.rc
